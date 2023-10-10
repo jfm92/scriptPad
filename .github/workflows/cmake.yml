@@ -1,0 +1,33 @@
+name: Build Firmware
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout SourceCode
+        uses: actions/checkout@v4.1.0
+
+      - name: Init Submodules
+        run: git submodule update --init --recursive
+      
+      - name: Install Arm GNU Toolchain (arm-none-eabi-gcc)
+        uses: carlosperate/arm-none-eabi-gcc-action@v1
+        with:
+          release: '11.3.Rel1'
+
+      - name: Set PICO_SDK_PATH
+        run: echo "PICO_SDK_PATH=/home/runner/work/scriptPad/scriptPad/scriptPad_firmware/pico-sdk" >> $GITHUB_ENV
+
+      - name: Configure the project
+        uses: threeal/cmake-action@v1.3.0
+        with:
+          source-dir: ${{github.workspace}}/scriptPad_firmware
+          build-dir: ${{github.workspace}}/scriptPad_firmware/build
+      
+      - name: Build project.
+        run: cd ${{github.workspace}}/scriptPad_firmware/build && make
