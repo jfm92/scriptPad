@@ -1,0 +1,4 @@
+[submodule "scriptPad_firmware/pico-sdk"]
+	path = scriptPad_firmware/pico-sdk
+	url = https://github.com/raspberrypi/pico-sdk
+	branch = 1.5.1
