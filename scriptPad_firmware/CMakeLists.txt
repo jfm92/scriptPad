@@ -8,8 +8,10 @@ set(FAMILY rp2040)
 set(BOARD pico_sdk)
 
 set(PICO_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/pico-sdk")
+set(FREERTOS_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS-Kernel")
 
 include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 
 project(scriptPad C CXX ASM)
 
@@ -32,7 +34,7 @@ add_compile_options(-Wall
 if (CMAKE_C_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-Wno-maybe-uninitialized)
 endif()
-    
+  
 add_executable(scriptPad main.cpp)
 
 # Source Files to include (Only specific developed for this project)
@@ -44,6 +46,12 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-target_link_libraries(scriptPad PUBLIC pico_stdlib)
+# We only want UART on debug mode
+#if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    pico_enable_stdio_usb(scriptPad 0)
+    pico_enable_stdio_uart(scriptPad 1)
+#endif()
+
+target_link_libraries(scriptPad PUBLIC pico_stdlib pico_unique_id FreeRTOS-Kernel-Heap4)
 
 pico_add_extra_outputs(scriptPad)

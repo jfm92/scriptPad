@@ -2,3 +2,7 @@
 	path = scriptPad_firmware/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
 	branch = 1.5.1
+[submodule "scriptPad_firmware/FreeRTOS-Kernel"]
+	path = scriptPad_firmware/FreeRTOS-Kernel
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
+	branch = smp
