@@ -40,10 +40,12 @@ add_executable(scriptPad main.cpp)
 # Source Files to include (Only specific developed for this project)
 target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
 )
 
 target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement
 )
 
 # We only want UART on debug mode
@@ -52,6 +54,6 @@ target_include_directories(scriptPad PUBLIC
     pico_enable_stdio_uart(scriptPad 1)
 #endif()
 
-target_link_libraries(scriptPad PUBLIC pico_stdlib pico_unique_id FreeRTOS-Kernel-Heap4)
+target_link_libraries(scriptPad PUBLIC pico_stdlib pico_unique_id  FreeRTOS-Kernel-Heap4)
 
 pico_add_extra_outputs(scriptPad)
