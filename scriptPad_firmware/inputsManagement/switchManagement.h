@@ -1,13 +1,59 @@
 #ifndef SWITCH_MANAGEMENT
 #define SWITCH_MANAGEMENT
 
+//freeRTOS libraries
 #include "queue.h"
+#include <vector>
+#include <map>
+#include <set>
 
 class switchManagement
 {
     public:
-        switchManagement(QueueHandle_t *_switchsPushQueue);
+        
+        // Initialize all GPIO with required configuration.
         void initGPIO();
+
+        // Method to add intraprocess message queue with pushed switches
+        void setMessageQueue(QueueHandle_t *_switchsPushQueue){ switchQUEUEInternal = _switchsPushQueue;};
+
+        // Method to get intraprocess message queue with pushed switches
+        QueueHandle_t *getMessageQueue() {return switchQUEUEInternal;};
+
+        // Method to set GPIO matrix config
+        void setSwitchConfig(std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> *_switchMatrix) {switchMatrix = _switchMatrix;};
+
+        // Method to get GPIO matrix config, returns a std::multimap<uint8_t, std::pair<uint8_t, uint8_t>>
+        auto *getSwitchConfig() {return switchMatrix;};
+        
+        //Singletone class initialization
+        static switchManagement& getInstance()
+        {
+            if (instance == nullptr)
+            {
+                instance = new switchManagement();
+            }
+            return *instance;
+        }
+
+        //Delete copy class operators
+        switchManagement(const switchManagement&) = delete;
+        switchManagement& operator=(const switchManagement&) = delete;
+
+    private:
+        static switchManagement* instance;
+        QueueHandle_t *switchQUEUEInternal = nullptr;
+        std::vector<int8_t> gpioQueue;
+        std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> *switchMatrix = nullptr;
+        bool gpiosInitialized = false;
+
+        switchManagement(){};
+        void addGPIOPushed(int8_t pushedGPIO);
+        int8_t getLastGPIOPushed();
+
+        // We need to access private method from these CB global functions.
+        friend void gpioCB(uint gpio, uint32_t events);
+        friend int64_t alarmCB(alarm_id_t id, void *user_data);   
 };
 
 #endif

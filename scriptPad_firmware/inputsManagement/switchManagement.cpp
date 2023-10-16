@@ -1,9 +1,7 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdint.h>
-#include <map>
-#include <set>
+
 #include <algorithm>
-#include <vector>
 
 #include "FreeRTOS.h"
 #include "pico/stdlib.h"
@@ -11,60 +9,71 @@
 #include "hardware/gpio.h"
 
 #include "switchManagement.h"
-#include "hwConfig.h"
+//#include "hwConfig.h"
 
-QueueHandle_t *switchQUEUEInternal;
-std::vector<uint8_t> gpioQueue;
+////////////////////// Externals callbacks //////////////////////
+int64_t alarmCB(alarm_id_t id, void *user_data);
 
-int64_t alarm_callback(alarm_id_t id, void *user_data);
+void gpioCB(uint gpio, uint32_t events)
+{
+    switchManagement& switchManagementInstance = switchManagement::getInstance();
+    QueueHandle_t *switchQUEUEInternal = switchManagementInstance.getMessageQueue();
 
-void pin_callback(uint gpio, uint32_t events) {
     BaseType_t xHigherPrioritTaskWoken = pdFALSE;
     //De-initialize to avoid switch bounching
-    gpio_set_irq_enabled_with_callback(gpio, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL , false, &pin_callback);
+    gpio_set_irq_enabled_with_callback(gpio, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL , false, &gpioCB);
 
-    auto range = switchMatrix.equal_range(gpio);
+    auto range = switchManagementInstance.getSwitchConfig()->equal_range(gpio);
 
     // We check which horizontal pins are pushed and if so, send switch id over the message queue
     for (auto iter = range.first; iter != range.second; ++iter) {
         if(!gpio_get(iter->second.second))
         {
             uint8_t ID = iter->second.first;
-            xQueueSendToFrontFromISR(*switchQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+            if(switchQUEUEInternal != nullptr)
+            {
+                xQueueSendToFrontFromISR(*switchQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+            }
         }
     }
 
     // We need to save on a global vector which gpio was de-initialize due to we will lose on alarm callback 
     // because this ISR function will be finished.
-    gpioQueue.push_back(gpio);
-    add_alarm_in_ms(250, alarm_callback, NULL, false); //Wait 250 ms until we active again that pin.
+    switchManagementInstance.addGPIOPushed(gpio);
+    add_alarm_in_ms(250, alarmCB, NULL, false); //Wait 250 ms until we active again that pin.
 }
 
-int64_t alarm_callback(alarm_id_t id, void *user_data) {
-    uint8_t gpioReactive = gpioQueue.back();
-    gpioQueue.pop_back();
-    gpio_set_irq_enabled_with_callback(gpioReactive, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL , true, &pin_callback);
+int64_t alarmCB(alarm_id_t id, void *user_data) 
+{
+    switchManagement& switchManagementInstance = switchManagement::getInstance();
+    int8_t gpioToReactive= switchManagementInstance.getLastGPIOPushed();
 
+    // If value is -1, means that we don't have any value in the queue. This is an unexpected situation, but just in case.
+    if(gpioToReactive > -1)
+    {
+        gpio_set_irq_enabled_with_callback(gpioToReactive, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL , true, &gpioCB);
+    }
+    
     return 0;
 }
 
-switchManagement::switchManagement(QueueHandle_t *_switchsPushQueue)
-{
-    switchQUEUEInternal = _switchsPushQueue;
-}
+////////////////////// Externals callbacks //////////////////////
 
 void switchManagement::initGPIO() {
+
+    if((switchMatrix== nullptr) || gpiosInitialized ) return;
+
     std::set<uint8_t> verticalGPIOUsed;
     std::set<uint8_t> horizontalGPIOUsed;
 
-    for (const auto& entry : switchMatrix) {
+    for (const auto& entry : *switchMatrix) {
         uint8_t verticalPin = entry.first;
         uint8_t horizontalPin = entry.second.second;
 
         if (verticalGPIOUsed.find(verticalPin) == verticalGPIOUsed.end()) {
-            // Set pull-up and EDGE callback ISR config for the vertical pin.
+            // Set pull-up and callback ISR config for the vertical pin.
             gpio_set_pulls(verticalPin, true, false);
-            gpio_set_irq_enabled_with_callback(verticalPin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &pin_callback);
+            gpio_set_irq_enabled_with_callback(verticalPin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &gpioCB);
 
             verticalGPIOUsed.insert(verticalPin);
         }
@@ -76,4 +85,22 @@ void switchManagement::initGPIO() {
             horizontalGPIOUsed.insert(horizontalPin);
         }
     }
+}
+
+void switchManagement::addGPIOPushed(int8_t pushedGPIO)
+{
+    gpioQueue.push_back(pushedGPIO);
+}
+
+int8_t switchManagement::getLastGPIOPushed()
+{
+    int8_t gpioBlocked = -1;
+
+    if(!gpioQueue.empty())
+    {
+        gpioBlocked = gpioQueue.back();
+        gpioQueue.pop_back();
+    }
+
+    return gpioBlocked;
 }
