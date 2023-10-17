@@ -58,6 +58,16 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
 )
 
+################################# External Libraries ##################################################
+target_sources(scriptPad PUBLIC 
+                ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON/cJSON.c
+)
+
+
+target_include_directories(scriptPad PUBLIC
+            ${CMAKE_CURRENT_SOURCE_DIR}/libries/cJSON.c
+)
+
 # We only want UART on debug mode
 #if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     pico_enable_stdio_usb(scriptPad 0)
