@@ -1,7 +1,3 @@
-[submodule "scriptPad_firmware/FreeRTOS-Kernel"]
-	path = scriptPad_firmware/FreeRTOS-Kernel
-	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
-	branch = smp
 [submodule "scriptPad_firmware/libraries/pico-filesystem"]
 	path = scriptPad_firmware/libraries/pico-filesystem
 	url = https://github.com/Memotech-Bill/pico-filesystem
@@ -9,3 +5,7 @@
 	path = scriptPad_firmware/libraries/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
 	branch = 1.5.1
+[submodule "scriptPad_firmware/libraries/FreeRTOS-Kernel"]
+	path = scriptPad_firmware/libraries/FreeRTOS-Kernel
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
+	branch = smp

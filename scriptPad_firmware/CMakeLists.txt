@@ -7,8 +7,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(FAMILY rp2040)
 set(BOARD pico_sdk)
 
-set(PICO_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/pico-sdk")
-set(FREERTOS_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/FreeRTOS-Kernel")
+set(PICO_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-sdk")
+set(FREERTOS_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/FreeRTOS-Kernel")
 
 
 include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
