@@ -9,21 +9,61 @@
 #include <tusb.h>
 
 #include <vector>
+#include <map>
+#include <list>
 
 class HIDManagement
 {
     public:
-        HIDManagement(QueueHandle_t *_switchQUEUEInternal) : switchQUEUEInternal(_switchQUEUEInternal) {};
+        
         bool initHID();
         void taskHID();
+
+        void saveMacrosDictionary(std::map<uint8_t, std::list<uint8_t>> _macrosDictionary);
+
+        // Method to add intraprocess message queue with pushed switches
+        void setMessageQueue(QueueHandle_t *_switchsPushQueue){ switchQUEUEInternal = _switchsPushQueue;};
+
+        // Method to get intraprocess message queue with pushed switches
+        QueueHandle_t *getMessageQueue() {return switchQUEUEInternal;};
+
+        //Singletone class initialization
+        static HIDManagement& getInstance()
+        {
+            if (instanceHID == nullptr)
+            {
+                instanceHID = new HIDManagement();
+            }
+            return *instanceHID;
+        }
+
+        //Delete copy class operators
+        HIDManagement(const HIDManagement&) = delete;
+        HIDManagement& operator=(const HIDManagement&) = delete;
+
         
     private:
+        static HIDManagement* instanceHID;
         QueueHandle_t *switchQUEUEInternal = nullptr;
         TimerHandle_t USBTimerInform = nullptr;
-        
+        std::map<uint8_t, std::list<uint8_t>> macrosDictionary;
+        std::vector<uint8_t> strokeQueue;
 
-        friend uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen);
-        friend void tud_hid_set_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t const* buffer, uint16_t bufsize);
+        HIDManagement(){};
+        // Send action to host device (Keyboard, mouse, HID)
+        void sendAction();
+
+        friend void informTimerCB(TimerHandle_t xTimer);
+        friend uint16_t tud_hid_get_report_cb(uint8_t instance, 
+                                            uint8_t report_id, 
+                                            hid_report_type_t report_type, 
+                                            uint8_t* buffer, 
+                                            uint16_t reqlen);
+        friend void tud_hid_set_report_cb(uint8_t instance, 
+                                        uint8_t report_id, 
+                                        hid_report_type_t report_type, 
+                                        uint8_t const* buffer, 
+                                        uint16_t bufsize);
 };
 
 #endif
