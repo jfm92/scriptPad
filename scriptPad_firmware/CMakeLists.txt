@@ -22,13 +22,12 @@ if (PICO_SDK_VERSION_STRING VERSION_LESS "1.5.1")
     message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.5.1 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
 
+
 pico_sdk_init()
 
 set(TINYUSB_FAMILY_PROJECT_NAME_PREFIX "tinyusb_host_")
 
 ###################################################################################
-
-add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
 
 add_compile_options(-Wall
         -Wno-error=null-dereference
@@ -49,13 +48,15 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
-)
+)   
 
 target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
+            ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
 )
 
 ################################# External Libraries ##################################################
@@ -68,6 +69,10 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/libries/cJSON.c
 )
 
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
+
+################################# External Libraries End ##################################################
+
 # We only want UART on debug mode
 #if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     pico_enable_stdio_usb(scriptPad 0)
@@ -75,11 +80,14 @@ target_include_directories(scriptPad PUBLIC
 #endif()
 
 target_link_libraries(scriptPad PUBLIC 
+                        flash_filesystem
                         pico_stdlib 
                         pico_unique_id
                         tinyusb_device    # This is required for TinyUSB
                         tinyusb_board    # Some additional board stuff for TinyUSB
                         FreeRTOS-Kernel-Heap4
-                        flash_filesystem)
+                        )
+
+
 
 pico_add_extra_outputs(scriptPad)
