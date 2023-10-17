@@ -28,6 +28,8 @@ set(TINYUSB_FAMILY_PROJECT_NAME_PREFIX "tinyusb_host_")
 
 ###################################################################################
 
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
+
 add_compile_options(-Wall
         -Wno-error=null-dereference
         -Wno-error=conversion
@@ -67,6 +69,7 @@ target_link_libraries(scriptPad PUBLIC
                         pico_unique_id
                         tinyusb_device    # This is required for TinyUSB
                         tinyusb_board    # Some additional board stuff for TinyUSB
-                        FreeRTOS-Kernel-Heap4)
+                        FreeRTOS-Kernel-Heap4
+                        flash_filesystem)
 
 pico_add_extra_outputs(scriptPad)
