@@ -11,6 +11,7 @@
 #include <vector>
 #include <map>
 #include <list>
+#include <string>
 
 class HIDManagement
 {
@@ -19,7 +20,7 @@ class HIDManagement
         bool initHID();
         void taskHID();
 
-        void saveMacrosDictionary(std::map<uint8_t, std::list<uint8_t>> _macrosDictionary);
+        bool saveMacrosDictionary(const char * const dataJSON);
 
         // Method to add intraprocess message queue with pushed switches
         void setMessageQueue(QueueHandle_t *_switchsPushQueue){ switchQUEUEInternal = _switchsPushQueue;};

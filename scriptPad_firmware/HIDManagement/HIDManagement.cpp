@@ -1,4 +1,5 @@
 #include "HIDManagement.h"
+#include "libraries/cJSON/cJSON.h"
 
 uint16_t tud_hid_get_report_cb(uint8_t instance, uint8_t report_id, hid_report_type_t report_type, uint8_t* buffer, uint16_t reqlen)
 {
@@ -60,9 +61,63 @@ void HIDManagement::taskHID()
     }
 }
 
-void HIDManagement::saveMacrosDictionary(std::map<uint8_t, std::list<uint8_t>> _macrosDictionary)
+bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
 {
-    macrosDictionary = _macrosDictionary;
+    bool succeed = false;
+
+    cJSON *dictionaryParsed = cJSON_Parse(dataJSON);
+    if(!dictionaryParsed)
+    {
+        printf("Error parsing dictonary JSON\n");
+        return succeed;
+    }
+
+    cJSON *switchMacro = NULL;
+    cJSON *switchMacrosList = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "switchMacros");
+    if(!switchMacrosList)
+    {
+        printf("Error Getting macro list from JSON\n");
+        return succeed;
+    }
+
+    //Iterates over all switch list to get macro associated to each switch
+    cJSON_ArrayForEach(switchMacro, switchMacrosList)
+    {
+        std::list<uint8_t> macrosCodeList;
+
+        //Get switch code associated.
+        cJSON *switchCode = cJSON_GetObjectItemCaseSensitive(switchMacro, "switchCode");
+        if(!switchCode)
+        {
+            printf("Error getting switchCode\n");
+            return succeed;
+        }
+
+        // Get macroCodes to be used
+        cJSON *macroCodes = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroCodes");
+        if(!macroCodes)
+        {
+            printf("Error getting macroCodes\n");
+            return succeed;
+        }
+
+        for(int i = 0; i < cJSON_GetArraySize(macroCodes); ++i)
+        {
+            //Get each element of the array
+            cJSON *codeKey = cJSON_GetArrayItem(macroCodes, i);
+            macrosCodeList.push_back(atoi(cJSON_Print(codeKey)));
+        }
+
+        //Asociate each switchCode with macroCodeList
+        macrosDictionary[atoi(cJSON_Print(switchCode))] = macrosCodeList;
+
+    }
+
+    cJSON_free(dictionaryParsed);
+
+    succeed = true;
+
+    return succeed;
 }
 
 void HIDManagement::sendAction()

@@ -1,0 +1,24 @@
+{
+    "name": "appXYZ",
+    "switch_macros":        [{
+                    "switch_code":  0,
+                    "macros":       [11, 18, 15, 4],
+                    "color_effect": 0
+            }, {
+                    "switch_code":  1,
+                    "macros":       [11, 18, 15, 4],
+                    "color_effect": 0
+            }, {
+                    "switch_code":  2,
+                    "macros":       [11, 18, 15, 4],
+                    "color_effect": 0
+            }, {
+                    "switch_code":  3,
+                    "macros":       [11, 18, 15, 4],
+                    "color_effect": 0
+            }, {
+                    "switch_code":  4,
+                    "macros":       [11, 18, 15, 4],
+                    "color_effect": 0
+            }]
+}
