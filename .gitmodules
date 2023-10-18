@@ -1,6 +1,6 @@
 [submodule "scriptPad_firmware/libraries/pico-filesystem"]
 	path = scriptPad_firmware/libraries/pico-filesystem
-	url = https://github.com/Memotech-Bill/pico-filesystem
+	url = https://github.com/jfm92/pico-filesystem
 [submodule "scriptPad_firmware/libraries/pico-sdk"]
 	path = scriptPad_firmware/libraries/pico-sdk
 	url = https://github.com/raspberrypi/pico-sdk
