@@ -1,4 +1,4 @@
-//#include <stdio.h>
+#include <stdio.h>
 #include <stdint.h>
 
 #include <algorithm>
@@ -9,7 +9,6 @@
 #include "hardware/gpio.h"
 
 #include "switchManagement.h"
-//#include "hwConfig.h"
 
 ////////////////////// Externals callbacks //////////////////////
 int64_t alarmCB(alarm_id_t id, void *user_data);
