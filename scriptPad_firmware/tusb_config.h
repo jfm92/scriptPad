@@ -20,10 +20,10 @@
 /////////////////////////////////////////////////////////
 //Modem stuff
 /////////////////////////////////////////////////////////
-/*#define CFG_TUD_ENABLED       1
+#define CFG_TUD_ENABLED       1
 //#define CFG_TUD_MAX_SPEED     BOARD_TUD_MAX_SPEED
 
 #define CFG_TUD_ECM_RNDIS     1
 #define CFG_TUD_NCM           (1-CFG_TUD_ECM_RNDIS)
 
-#define CFG_TUH_DEVICE_MAX          2*/
+#define CFG_TUH_DEVICE_MAX          2

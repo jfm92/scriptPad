@@ -49,7 +49,7 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/configManagement/configManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement/modemUSBManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
 )   
 
@@ -58,7 +58,7 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
-            ${CMAKE_CURRENT_SOURCE_DIR}/configManagement
+            ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement
 )
 
 ################################# External Libraries ##################################################

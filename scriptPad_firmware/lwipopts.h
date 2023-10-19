@@ -26,8 +26,8 @@
 
 #define PBUF_POOL_SIZE                  2
 
-#define HTTPD_USE_CUSTOM_FSDATA         1
-#define HTTPD_FSDATA_FILE               "" //TODO: Add .c with page 
+#define HTTPD_USE_CUSTOM_FSDATA         0 //TODO: CHange this to 1
+//#define HTTPD_FSDATA_FILE               "" //TODO: Add .c with page 
 
 #define LWIP_MULTICAST_PING             1
 #define LWIP_BROADCAST_PING             1
