@@ -49,6 +49,7 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/configManagement/configManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
 )   
 
@@ -57,17 +58,58 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
+            ${CMAKE_CURRENT_SOURCE_DIR}/configManagement
 )
 
 ################################# External Libraries ##################################################
-target_sources(scriptPad PUBLIC 
-                ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON/cJSON.c
-)
-
 
 target_include_directories(scriptPad PUBLIC
-            ${CMAKE_CURRENT_SOURCE_DIR}/libries/cJSON.c
-)
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON
+            ${PICO_SDK_PATH}/lib/lwip/src/include
+            ${PICO_SDK_PATH}/lib/lwip/src/include/ipv4
+            ${PICO_SDK_PATH}/lib/lwip/src/include/lwip/apps
+            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking
+            )
+
+target_sources(scriptPad PUBLIC
+            ${PICO_SDK_PATH}/lib/lwip/src/core/altcp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/altcp_alloc.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/altcp_tcp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/def.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/dns.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/inet_chksum.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/init.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ip.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/mem.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/memp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/netif.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/pbuf.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/raw.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/stats.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/sys.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/tcp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/tcp_in.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/tcp_out.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/timeouts.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/udp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/autoip.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/dhcp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/etharp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/icmp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/igmp.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/ip4.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/ip4_addr.c
+            ${PICO_SDK_PATH}/lib/lwip/src/core/ipv4/ip4_frag.c
+            ${PICO_SDK_PATH}/lib/lwip/src/netif/ethernet.c
+            ${PICO_SDK_PATH}/lib/lwip/src/netif/slipif.c
+            ${PICO_SDK_PATH}/lib/lwip/src/apps/http/httpd.c
+            ${PICO_SDK_PATH}/lib/lwip/src/apps/http/fs.c
+            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/dhserver.c
+            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/dnserver.c
+            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/rndis_reports.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON/cJSON.c
+            )
 
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
 
