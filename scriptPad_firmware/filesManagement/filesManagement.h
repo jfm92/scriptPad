@@ -14,7 +14,7 @@
 class filesManagement
 {
     public:
-        filesManagement(){};
+        
         //Initialize filesystem and mount volume
         void initFileManagement();
         //Try to open a file and if it exist and it's valid it returns file content
@@ -28,9 +28,27 @@ class filesManagement
         //Return a list of files available on fs
         void listFiles(std::list<std::string> *listName);
 
+        //Singletone class initialization
+        static filesManagement& getInstance()
+        {
+            if (instanceFileManagement == nullptr)
+            {
+                instanceFileManagement = new filesManagement();
+            }
+            return *instanceFileManagement;
+        }
+
+        //Delete copy class operators
+        filesManagement(const filesManagement&) = delete;
+        filesManagement& operator=(const filesManagement&) = delete;
+
     private:
         struct pfs_pfs *pfs;
         struct lfs_config cfg;
+
+        static filesManagement* instanceFileManagement;
+
+        filesManagement(){};
 };
 
 #endif
