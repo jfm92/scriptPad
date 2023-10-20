@@ -13,6 +13,7 @@
 #include "lwip/mem.h"
 
 #include "modemUSBManagement.h"
+#include "../filesManagement/filesManagement.h"
 
 #define INIT_IP4(a,b,c,d) { PP_HTONL(LWIP_MAKEU32(a,b,c,d)) }
 
@@ -91,29 +92,31 @@ err_t httpd_post_receive_data(void *connection, struct pbuf *p)
 }
 
 
+
 bool modemUSBManagement::initConfigManager()
 {
-    ipaddr  = INIT_IP4(192, 168, 7, 1);
-    netmask = INIT_IP4(255, 255, 255, 0);
-    gateway = INIT_IP4(0, 0, 0, 0);
+  //TODO: Temporary hardcoded, this should be handle in a different way
+  ipaddr  = INIT_IP4(192, 168, 7, 1);
+  netmask = INIT_IP4(255, 255, 255, 0);
+  gateway = INIT_IP4(0, 0, 0, 0);
 
-    entries[0] = { {0}, INIT_IP4(192, 168, 7, 2), 24 * 60 * 60 };
-    entries[1] = { {0}, INIT_IP4(192, 168, 7, 3), 24 * 60 * 60 };
-    entries[2] = { {0}, INIT_IP4(192, 168, 7, 4), 24 * 60 * 60 };
+  entries[0] = { {0}, INIT_IP4(192, 168, 7, 2), 24 * 60 * 60 };
+  entries[1] = { {0}, INIT_IP4(192, 168, 7, 3), 24 * 60 * 60 };
+  entries[2] = { {0}, INIT_IP4(192, 168, 7, 4), 24 * 60 * 60 };
 
-    dhcp_config.router = INIT_IP4(0, 0, 0, 0);
-    dhcp_config.port = 67;
-    dhcp_config.dns = INIT_IP4(192, 168, 7, 1);
-    dhcp_config.domain = "usb";
-    dhcp_config.num_entry = TU_ARRAY_SIZE(entries);
-    dhcp_config.entries = entries;
+  dhcp_config.router = INIT_IP4(0, 0, 0, 0);
+  dhcp_config.port = 67;
+  dhcp_config.dns = INIT_IP4(192, 168, 7, 1);
+  dhcp_config.domain = "usb";
+  dhcp_config.num_entry = TU_ARRAY_SIZE(entries);
+  dhcp_config.entries = entries;
 
-    tud_init(0);
-    init_lwip();
-    while (!netif_is_up(&netif_data));
-    while (dhserv_init(&dhcp_config) != ERR_OK);
-    while (dnserv_init(IP_ADDR_ANY, 53, dns_query_proc) != ERR_OK);
-    httpd_init();
+  tud_init(0);
+  init_lwip();
+  while (!netif_is_up(&netif_data));
+  while (dhserv_init(&dhcp_config) != ERR_OK);
+  while (dnserv_init(IP_ADDR_ANY, 53, dns_query_proc) != ERR_OK);
+  httpd_init();
   
   return true;
 }
