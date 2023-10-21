@@ -50,6 +50,7 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement/modemUSBManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ST7789V/ST7789V.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
 )   
 
@@ -59,6 +60,7 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement
+            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ST7789V
 )
 
 ################################# External Libraries ##################################################
@@ -125,6 +127,7 @@ target_link_libraries(scriptPad PUBLIC
                         flash_filesystem
                         pico_stdlib 
                         pico_unique_id
+                        hardware_spi
                         tinyusb_device    # This is required for TinyUSB
                         tinyusb_board    # Some additional board stuff for TinyUSB
                         FreeRTOS-Kernel-Heap4
