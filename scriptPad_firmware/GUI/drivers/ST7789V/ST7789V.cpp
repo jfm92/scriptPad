@@ -5,31 +5,26 @@
 
 #include "pico/stdlib.h"
 #include "hardware/gpio.h"
-#include "hardware/spi.h"
 
-#define SPI_PORT spi1
-#define LCD_RST_PIN  12
-#define LCD_DC_PIN   8
-    
-#define LCD_CS_PIN   9
-#define LCD_CLK_PIN  10
-#define LCD_MOSI_PIN 11
+#include <map>
+#include <vector>
 
-bool ST7789V::init(/*uint16_t height, uint16_t width*/)
+bool ST7789V::init()
 {
-    spi_init(SPI_PORT, 80000 * 1000);
-    gpio_set_function(LCD_CLK_PIN, GPIO_FUNC_SPI);
-    gpio_set_function(LCD_MOSI_PIN, GPIO_FUNC_SPI);
+    spi_init(spi1, baudRate);
+    gpio_set_function(sckGPIO, GPIO_FUNC_SPI);
+    gpio_set_function(mosiGPIO, GPIO_FUNC_SPI);
 
-    gpio_init(LCD_CS_PIN);
-    gpio_init(LCD_RST_PIN);
-    gpio_init(LCD_DC_PIN);
-    gpio_set_dir(LCD_CS_PIN, GPIO_OUT);
-    gpio_set_dir(LCD_RST_PIN, GPIO_OUT);
-    gpio_set_dir(LCD_DC_PIN, GPIO_OUT);
+    gpio_init(csGPIO);
+    gpio_init(rstGPIO);
+    gpio_init(dcGPIO);
 
-    gpio_put(LCD_CS_PIN, 1);
-    gpio_put(LCD_DC_PIN, 0);
+    gpio_set_dir(csGPIO, GPIO_OUT);
+    gpio_set_dir(rstGPIO, GPIO_OUT);
+    gpio_set_dir(dcGPIO, GPIO_OUT);
+
+    gpio_put(csGPIO, 1);
+    gpio_put(dcGPIO, 0);
 
     reset();
     sendDisplayInitialization();
@@ -39,49 +34,44 @@ bool ST7789V::init(/*uint16_t height, uint16_t width*/)
 
 void ST7789V::clear(uint16_t color)
 {
-    uint16_t image[240];
-    int i = 0;
+    uint16_t image[resolutionHeight];
 
-    for(i = 0; i < 240; i++)
-    {
-        image[i] =color>>8 | (color&0xff)<<8;
-    }
+	memset(image, (color>>8 | (color&0xff)<<8), resolutionHeight);
 
     uint8_t *pixel = (uint8_t *)image;
-    setWindows(0,0,240, 320);
+    setWindows(0,0,resolutionHeight, resolutionWidth);
 
-    gpio_put(LCD_DC_PIN, 1);
-    gpio_put(LCD_CS_PIN, 0);
+    gpio_put(dcGPIO, 1);
+    gpio_put(csGPIO, 0);
 
-    for(i = 0; i< 320; i++)
+    for(int i = 0; i< resolutionWidth; i++)
     {
-        sendDataN(pixel, 240*2);
+        sendDataN(pixel, resolutionHeight*2);
     }
-    gpio_put(LCD_CS_PIN, 1);
+    gpio_put(csGPIO, 1);
 
 }
 
 void ST7789V::draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p)
 {
-	int i = 0;
 	setWindows(startX,startY,endX, endY);
 
-    gpio_put(LCD_DC_PIN, 1);
-    gpio_put(LCD_CS_PIN, 0);
+    gpio_put(dcGPIO, 1);
+    gpio_put(csGPIO, 0);
 
-    sendDataN((uint8_t *)color_p, 320 * 20);
+    sendDataN((uint8_t *)color_p, resolutionWidth * bufferLines * 2);
 
-    gpio_put(LCD_CS_PIN, 1);
+    gpio_put(csGPIO, 1);
 
 }
 
 void ST7789V::reset()
 {
-    gpio_put(LCD_RST_PIN, 1);
+    gpio_put(rstGPIO, 1);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_put(LCD_RST_PIN, 0);
+    gpio_put(rstGPIO, 0);
     vTaskDelay(pdMS_TO_TICKS(100));
-    gpio_put(LCD_RST_PIN, 1);
+    gpio_put(rstGPIO, 1);
     vTaskDelay(pdMS_TO_TICKS(100));
 }
 
@@ -94,22 +84,22 @@ void ST7789V::setScreenConfig()
 
 void ST7789V::sendCommand(uint8_t reg)
 {
-    gpio_put(LCD_DC_PIN, 0);
-    gpio_put(LCD_CS_PIN, 0);
+    gpio_put(dcGPIO, 0);
+    gpio_put(csGPIO, 0);
 
     spi_write_blocking(SPI_PORT, &reg, 1);
 
-    gpio_put(LCD_CS_PIN, 1);
+    gpio_put(csGPIO, 1);
 }
 
 void ST7789V::sendData(uint8_t reg)
 {
-    gpio_put(LCD_DC_PIN, 1);
-    gpio_put(LCD_CS_PIN, 0);
+    gpio_put(dcGPIO, 1);
+    gpio_put(csGPIO, 0);
 
     spi_write_blocking(SPI_PORT, &reg, 1);
 
-    gpio_put(LCD_CS_PIN, 1);
+    gpio_put(csGPIO, 1);
 }
 
 void ST7789V::sendDataN(uint8_t reg[], uint32_t dataLenght)
@@ -118,95 +108,41 @@ void ST7789V::sendDataN(uint8_t reg[], uint32_t dataLenght)
 }
 
 void ST7789V::sendDisplayInitialization()
-{
-    sendCommand(0x36);
-	sendData(0x70); 
+{	
+	//Command code , Data to send
+	std::multimap<uint8_t, std::vector<uint8_t>> initList = {
+        {0x36, {0x70}}, //Set screen orientation
+        {0x3A, {0x05}},
+        {0x21, {}},
+        {0x2A, {0x00, 0x00, 0x01, 0x3F}},
+        {0x2B, {0x00, 0x00, 0x00, 0xEF}},
+        {0xB2, {0x0C, 0x0C, 0x00, 0x33, 0x33}},
+        {0xB7, {0x35}},
+        {0xBB, {0x1F}},
+        {0xC0, {0x2C}},
+        {0xC2, {0x01}},
+        {0xC3, {0x12}},
+        {0xC4, {0x20}},
+        {0xC6, {0x0F}},
+        {0xD0, {0xA4, 0xA1}},
+        {0xE0, {0xD0, 0x08, 0x11, 0x08, 0x0C, 0x15, 0x39, 0x33, 0x50, 0x36, 0x13, 0x14, 0x29, 0x2D}},
+        {0xE1, {0xD0, 0x08, 0x10, 0x08, 0x06, 0x06, 0x39, 0x44, 0x51, 0x0B, 0x16, 0x14, 0x2F, 0x31}},
+        {0x21, {}},
+        {0x11, {}},
+        {0x29, {}}
+    };
 
-	sendCommand(0x3A); 
-	sendData(0x05);
-
-	sendCommand(0x21); 
-
-	sendCommand(0x2A);
-	sendData(0x00);
-	sendData(0x00);
-	sendData(0x01);
-	sendData(0x3F);
-
-	sendCommand(0x2B);
-	sendData(0x00);
-	sendData(0x00);
-	sendData(0x00);
-	sendData(0xEF);
-
-	sendCommand(0xB2);
-	sendData(0x0C);
-	sendData(0x0C);
-	sendData(0x00);
-	sendData(0x33);
-	sendData(0x33);
-
-	sendCommand(0xB7);
-	sendData(0x35); 
-
-	sendCommand(0xBB);
-	sendData(0x1F);
-
-	sendCommand(0xC0);
-	sendData(0x2C);
-
-	sendCommand(0xC2);
-	sendData(0x01);
-
-	sendCommand(0xC3);
-	sendData(0x12);   
-
-	sendCommand(0xC4);
-	sendData(0x20);
-
-	sendCommand(0xC6);
-	sendData(0x0F); 
-
-	sendCommand(0xD0);
-	sendData(0xA4);
-	sendData(0xA1);
-
-	sendCommand(0xE0);
-	sendData(0xD0);
-	sendData(0x08);
-	sendData(0x11);
-	sendData(0x08);
-	sendData(0x0C);
-	sendData(0x15);
-	sendData(0x39);
-	sendData(0x33);
-	sendData(0x50);
-	sendData(0x36);
-	sendData(0x13);
-	sendData(0x14);
-	sendData(0x29);
-	sendData(0x2D);
-
-	sendCommand(0xE1);
-	sendData(0xD0);
-	sendData(0x08);
-	sendData(0x10);
-	sendData(0x08);
-	sendData(0x06);
-	sendData(0x06);
-	sendData(0x39);
-	sendData(0x44);
-	sendData(0x51);
-	sendData(0x0B);
-	sendData(0x16);
-	sendData(0x14);
-	sendData(0x2F);
-	sendData(0x31);
-	sendCommand(0x21);
-
-	sendCommand(0x11);
-
-	sendCommand(0x29);
+	for (auto entry : initList)
+	{
+		sendCommand(static_cast<uint8_t>(entry.first));
+		if(!entry.second.empty())
+		{
+			for (auto data : entry.second)
+			{
+				sendData(static_cast<uint8_t>(data));
+       		}
+		}
+    }
 }
 
 void ST7789V::setWindows(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY)
