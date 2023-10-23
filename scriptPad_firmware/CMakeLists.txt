@@ -117,7 +117,7 @@ target_sources(scriptPad PUBLIC
             )
 
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
-add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/GUI/LVGL LVGL)
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/LVGL lvgl)
 
 ################################# External Libraries End ##################################################
 
