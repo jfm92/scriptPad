@@ -9,19 +9,18 @@ set(BOARD pico_sdk)
 
 set(PICO_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-sdk")
 set(FREERTOS_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/FreeRTOS-Kernel")
+set(LV_CONF_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GUI/")
 
 
 include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
 include(${PICO_SDK_PATH}/lib/tinyusb/hw/bsp/family_support.cmake)
 
-
 project(scriptPad C CXX ASM)
 
 if (PICO_SDK_VERSION_STRING VERSION_LESS "1.5.1")
     message(FATAL_ERROR "Raspberry Pi Pico SDK version 1.5.1 (or later) required. Your version is ${PICO_SDK_VERSION_STRING}")
 endif()
-
 
 pico_sdk_init()
 
@@ -34,6 +33,8 @@ add_compile_options(-Wall
         -Wno-error=conversion
         -Wno-error=sign-conversion
         -Wno-error=sign-compare
+        -DLV_CONF_SUPPRESS_DEFINE_CHECK
+        -DLV_COLOR_16_SWAP=1
         )
 
 
@@ -50,8 +51,9 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement/modemUSBManagement.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ST7789V/ST7789V.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V/ST7789V.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lv_conf.h
 )   
 
 target_include_directories(scriptPad PUBLIC
@@ -60,7 +62,8 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement
-            ${CMAKE_CURRENT_SOURCE_DIR}/drivers/ST7789V
+            ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V
+            ${CMAKE_CURRENT_SOURCE_DIR}/GUI
 )
 
 ################################# External Libraries ##################################################
@@ -114,6 +117,7 @@ target_sources(scriptPad PUBLIC
             )
 
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/GUI/LVGL LVGL)
 
 ################################# External Libraries End ##################################################
 
@@ -130,6 +134,7 @@ target_link_libraries(scriptPad PUBLIC
                         hardware_spi
                         tinyusb_device    # This is required for TinyUSB
                         tinyusb_board    # Some additional board stuff for TinyUSB
+                        lvgl
                         FreeRTOS-Kernel-Heap4
                         )
 
