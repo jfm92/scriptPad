@@ -2,6 +2,7 @@
 #define ST7789V_DRIVER
 
 #include "stdint.h"
+#include "lvgl.h"
 
 class ST7789V
 {
@@ -9,6 +10,7 @@ class ST7789V
         ST7789V(/*uint8_t _sckGPIO, uint8_t _mosiGPIO, uint8_t _csGPIO, uint8_t _rstGPIO, uint8_t _dcGPIO*/){}
         bool init(/*uint16_t height, uint16_t width*/);
         void clear(uint16_t color);
+        void draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p);
 
 
     private:

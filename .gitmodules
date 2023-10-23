@@ -12,3 +12,6 @@
 [submodule "scriptPad_firmware/libraries/pico-filesystem"]
 	path = scriptPad_firmware/libraries/pico-filesystem
 	url = https://github.com/Memotech-Bill/pico-filesystem
+[submodule "scriptPad_firmware/GUI/LVGL"]
+	path = scriptPad_firmware/GUI/LVGL
+	url = https://github.com/lvgl/lvgl

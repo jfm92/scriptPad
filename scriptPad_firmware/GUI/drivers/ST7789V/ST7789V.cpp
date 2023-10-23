@@ -17,7 +17,7 @@
 
 bool ST7789V::init(/*uint16_t height, uint16_t width*/)
 {
-    spi_init(SPI_PORT, 10000 * 1000);
+    spi_init(SPI_PORT, 80000 * 1000);
     gpio_set_function(LCD_CLK_PIN, GPIO_FUNC_SPI);
     gpio_set_function(LCD_MOSI_PIN, GPIO_FUNC_SPI);
 
@@ -57,6 +57,20 @@ void ST7789V::clear(uint16_t color)
     {
         sendDataN(pixel, 240*2);
     }
+    gpio_put(LCD_CS_PIN, 1);
+
+}
+
+void ST7789V::draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p)
+{
+	int i = 0;
+	setWindows(startX,startY,endX, endY);
+
+    gpio_put(LCD_DC_PIN, 1);
+    gpio_put(LCD_CS_PIN, 0);
+
+    sendDataN((uint8_t *)color_p, 320 * 20);
+
     gpio_put(LCD_CS_PIN, 1);
 
 }
@@ -106,7 +120,7 @@ void ST7789V::sendDataN(uint8_t reg[], uint32_t dataLenght)
 void ST7789V::sendDisplayInitialization()
 {
     sendCommand(0x36);
-	sendData(0x00); 
+	sendData(0x70); 
 
 	sendCommand(0x3A); 
 	sendData(0x05);
