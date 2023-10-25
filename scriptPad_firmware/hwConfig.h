@@ -2,9 +2,15 @@
 
 
 std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> switchMatrix = {
-    std::make_pair(15, std::make_pair(0x00, 13)),
-    std::make_pair(15, std::make_pair(0x01, 12)),
-    std::make_pair(14, std::make_pair(0x02, 13)),
+    std::make_pair(18, std::make_pair(0x00, 19)),
+    std::make_pair(18, std::make_pair(0x01, 20)),
+    std::make_pair(18, std::make_pair(0x02, 21)),
+    std::make_pair(17, std::make_pair(0x03, 19)),
+    std::make_pair(17, std::make_pair(0x04, 20)),
+    std::make_pair(17, std::make_pair(0x05, 21)),
+    std::make_pair(16, std::make_pair(0x06, 19)),
+    std::make_pair(16, std::make_pair(0x07, 20)),
+    std::make_pair(16, std::make_pair(0x08, 21)),
 };
 
 

@@ -5,7 +5,6 @@
 
 #include "FreeRTOS.h"
 #include "pico/stdlib.h"
-#include "pico/time.h"
 #include "hardware/gpio.h"
 
 #include "switchManagement.h"
@@ -26,7 +25,7 @@ void gpioCB(uint gpio, uint32_t events)
 
     // We check which horizontal pins are pushed and if so, send switch id over the message queue
     for (auto iter = range.first; iter != range.second; ++iter) {
-        if(!gpio_get(iter->second.second))
+        if(iter->second.second== switchManagementInstance.gpioPushed)
         {
             uint8_t ID = iter->second.first;
             if(switchQUEUEInternal != nullptr)
@@ -56,14 +55,30 @@ int64_t alarmCB(alarm_id_t id, void *user_data)
     return 0;
 }
 
-////////////////////// Externals callbacks //////////////////////
+void gpioTask(void *param)
+{
+    switchManagement& switchManagementInstance = switchManagement::getInstance();
+
+    while(1)
+    {   
+        float pollingTime = switchManagementInstance.getPollingTimeNs();
+        for(uint8_t gpioPin : switchManagementInstance.horizontalGPIOUsed)
+        {
+            switchManagementInstance.gpioPushed = gpioPin;
+            gpio_put(gpioPin, 1);
+            vTaskDelay(pdMS_TO_TICKS(pollingTime));
+            gpio_put(gpioPin, 0);
+            vTaskDelay(pdMS_TO_TICKS(pollingTime));
+        }
+        
+    }
+}
+
+////////////////////// Externals callbacks End //////////////////////
 
 void switchManagement::initGPIO() {
 
     if((switchMatrix== nullptr) || gpiosInitialized ) return;
-
-    std::set<uint8_t> verticalGPIOUsed;
-    std::set<uint8_t> horizontalGPIOUsed;
 
     for (const auto& entry : *switchMatrix) {
         uint8_t verticalPin = entry.first;
@@ -71,7 +86,7 @@ void switchManagement::initGPIO() {
 
         if (verticalGPIOUsed.find(verticalPin) == verticalGPIOUsed.end()) {
             // Set pull-up and callback ISR config for the vertical pin.
-            gpio_set_pulls(verticalPin, true, false);
+            gpio_set_pulls(verticalPin, false, true);
             gpio_set_irq_enabled_with_callback(verticalPin, GPIO_IRQ_EDGE_RISE | GPIO_IRQ_EDGE_FALL, true, &gpioCB);
 
             verticalGPIOUsed.insert(verticalPin);
@@ -79,11 +94,14 @@ void switchManagement::initGPIO() {
 
         if (horizontalGPIOUsed.find(horizontalPin) == horizontalGPIOUsed.end()) {
             // Set pull-up for the horizontal pin.
-            gpio_set_pulls(horizontalPin, true, false);
+            gpio_init(horizontalPin);
+            gpio_set_dir(horizontalPin, true);
 
-            horizontalGPIOUsed.insert(horizontalPin);
+            horizontalGPIOUsed.insert(horizontalPin); //Might be some values are duplicated, so we don't want to initialize twice
         }
     }
+
+    xTaskCreate( gpioTask, "gpioControl", 4096, NULL, configMAX_PRIORITIES-1, NULL);
 }
 
 void switchManagement::addGPIOPushed(int8_t pushedGPIO)
