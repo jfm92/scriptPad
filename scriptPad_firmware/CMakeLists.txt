@@ -52,8 +52,9 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement/modemUSBManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V/ST7789V.cpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/GUI/GUI.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lv_conf.h
+            ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c    
 )   
 
 target_include_directories(scriptPad PUBLIC
