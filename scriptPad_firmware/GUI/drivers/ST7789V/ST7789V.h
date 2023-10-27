@@ -9,9 +9,6 @@
 class ST7789V
 {
     public:
-        ST7789V(uint8_t _sckGPIO, uint8_t _mosiGPIO, uint8_t _csGPIO, uint8_t _rstGPIO, uint8_t _dcGPIO)
-        : sckGPIO(_sckGPIO), mosiGPIO(_mosiGPIO), csGPIO(_csGPIO), rstGPIO(_rstGPIO), dcGPIO(_dcGPIO){};
-
         void setBaudRate(uint32_t _baudRate) {
             baudRate = _baudRate;
         }
@@ -41,12 +38,26 @@ class ST7789V
         void clear(uint16_t color);
         void draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p);
 
+        //Singletone class initialization
+        static ST7789V& getInstance()
+        {
+            if (instaceST7789V == nullptr)
+            {
+                instaceST7789V = new ST7789V();
+            }
+            return *instaceST7789V;
+        }
+
+        //Delete copy class operators
+        ST7789V(const ST7789V&) = delete;
+        ST7789V& operator=(const ST7789V&) = delete;
+
     private:
-        uint8_t sckGPIO;
-        uint8_t mosiGPIO;
-        uint8_t csGPIO;
-        uint8_t rstGPIO;
-        uint8_t dcGPIO;
+        uint8_t sckGPIO = 10;
+        uint8_t mosiGPIO = 11;
+        uint8_t csGPIO = 9;
+        uint8_t rstGPIO = 12;
+        uint8_t dcGPIO = 8;
 
         uint16_t resolutionHeight = 240;
         uint16_t resolutionWidth = 320;
@@ -57,6 +68,9 @@ class ST7789V
 
         spi_inst_t *SPI_PORT = spi1;
 
+        static ST7789V* instaceST7789V;
+
+        ST7789V(){};
 
         void reset();
         void setScreenConfig();
