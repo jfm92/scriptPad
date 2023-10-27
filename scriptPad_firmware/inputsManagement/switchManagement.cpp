@@ -15,7 +15,8 @@ int64_t alarmCB(alarm_id_t id, void *user_data);
 void gpioCB(uint gpio, uint32_t events)
 {
     switchManagement& switchManagementInstance = switchManagement::getInstance();
-    QueueHandle_t *switchQUEUEInternal = switchManagementInstance.getMessageQueue();
+    QueueHandle_t *switchQUEUEInternal = switchManagementInstance.getHIDMessageQueue();
+    QueueHandle_t *GUIQUEUEInternal = switchManagementInstance.getGUIMessageQueue();
 
     BaseType_t xHigherPrioritTaskWoken = pdFALSE;
     //De-initialize to avoid switch bounching
@@ -31,6 +32,7 @@ void gpioCB(uint gpio, uint32_t events)
             if(switchQUEUEInternal != nullptr)
             {
                 xQueueSendToFrontFromISR(*switchQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+                xQueueSendToFrontFromISR(*GUIQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
             }
         }
     }

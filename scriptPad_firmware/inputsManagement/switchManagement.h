@@ -16,10 +16,16 @@ class switchManagement
         void initGPIO();
 
         // Method to add intraprocess message queue with pushed switches
-        void setMessageQueue(QueueHandle_t *_switchsPushQueue){ switchQUEUEInternal = _switchsPushQueue;};
+        void setHIDMessageQueue(QueueHandle_t *_switchsPushQueue){ switchQUEUEInternal = _switchsPushQueue;};
 
         // Method to get intraprocess message queue with pushed switches
-        QueueHandle_t *getMessageQueue() {return switchQUEUEInternal;};
+        QueueHandle_t *getHIDMessageQueue() {return switchQUEUEInternal;};
+
+        // Method to add intraprocess message queue with pushed switches
+        void setGUIMessageQueue(QueueHandle_t *_GUIPushQueue){ GUIQUEUEInternal = _GUIPushQueue;};
+
+        // Method to get intraprocess message queue with pushed switches
+        QueueHandle_t *getGUIMessageQueue() {return GUIQUEUEInternal;};
 
         // Method to set GPIO matrix config
         void setSwitchConfig(std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> *_switchMatrix) {switchMatrix = _switchMatrix;};
@@ -48,6 +54,7 @@ class switchManagement
     private:
         static switchManagement* instance;
         QueueHandle_t *switchQUEUEInternal = nullptr;
+        QueueHandle_t *GUIQUEUEInternal = nullptr;
         std::vector<int8_t> gpioQueue;
         std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> *switchMatrix = nullptr;
         bool gpiosInitialized = false;
