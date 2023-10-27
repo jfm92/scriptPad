@@ -2,22 +2,27 @@
     "name": "appXYZ",
     "switch_macros":        [{
                     "switch_code":  0,
+                    "macro_name": "macro1",
                     "macros":       [11, 18, 15, 4],
                     "color_effect": 0
             }, {
                     "switch_code":  1,
+                    "macro_name": "macro2",
                     "macros":       [11, 18, 15, 4],
                     "color_effect": 0
             }, {
                     "switch_code":  2,
+                    "macro_name": "macro3",
                     "macros":       [11, 18, 15, 4],
                     "color_effect": 0
             }, {
                     "switch_code":  3,
+                    "macro_name": "macro4",
                     "macros":       [11, 18, 15, 4],
                     "color_effect": 0
             }, {
                     "switch_code":  4,
+                    "macro_name": "macro5",
                     "macros":       [11, 18, 15, 4],
                     "color_effect": 0
             }]
