@@ -1,4 +1,5 @@
 #include "filesManagement.h"
+#include <bits/stdc++.h>
 
 void filesManagement::initFileManagement()
 {
@@ -97,4 +98,16 @@ void filesManagement::listFiles(std::list<std::string> *listName)
     closedir(fsDirectory);
 
     return;
+}
+
+void filesManagement::checkPreviousMacroUsed(std::string *fileName)
+{
+    std::list<std::string> filesList;
+    listFiles(&filesList);
+
+    auto foundPosition = std::find(filesList.begin(), filesList.end(), fileConfigName);
+    if(foundPosition != filesList.end())
+    {
+        readFileContent(fileConfigName, fileName);
+    }
 }
