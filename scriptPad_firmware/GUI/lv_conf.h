@@ -708,7 +708,7 @@
         #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
     #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
-
+#define LV_USE_GROUP            1
 /*==================
 * EXAMPLES
 *==================*/
