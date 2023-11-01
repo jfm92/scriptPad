@@ -64,6 +64,9 @@ void HIDManagement::taskHID()
 bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
 {
     bool succeed = false;
+    cJSON *codeKey;
+    cJSON *macroCodes;
+    cJSON *switchCode;
 
     cJSON *dictionaryParsed = cJSON_Parse(dataJSON);
     if(!dictionaryParsed)
@@ -94,7 +97,7 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
         }
 
         // Get macroCodes to be used
-        cJSON *macroCodes = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroCodes");
+        macroCodes = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroCodes");
         if(!macroCodes)
         {
             printf("Error getting macroCodes\n");
@@ -104,8 +107,9 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
         for(int i = 0; i < cJSON_GetArraySize(macroCodes); ++i)
         {
             //Get each element of the array
-            cJSON *codeKey = cJSON_GetArrayItem(macroCodes, i);
+            codeKey = cJSON_GetArrayItem(macroCodes, i);
             macrosCodeList.push_back(atoi(cJSON_Print(codeKey)));
+           // cJSON_free(codeKey);
         }
 
         //Asociate each switchCode with macroCodeList
@@ -113,6 +117,11 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
 
     }
 
+    cJSON_free(codeKey);
+    cJSON_free(switchCode);
+    cJSON_free(macroCodes);
+    cJSON_free(switchMacrosList);
+    cJSON_free(switchMacro);
     cJSON_free(dictionaryParsed);
 
     succeed = true;
