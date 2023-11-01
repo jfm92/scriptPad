@@ -1,4 +1,5 @@
 #include "filesManagement.h"
+#include "libraries/cJSON/cJSON.h"
 #include <bits/stdc++.h>
 
 void filesManagement::initFileManagement()
@@ -110,4 +111,58 @@ void filesManagement::checkPreviousMacroUsed(std::string *fileName)
     {
         readFileContent(fileConfigName, fileName);
     }
+}
+
+void filesManagement::listMacroNames(std::string *fileContent, std::map<uint8_t, std::string> *macros, std::string *profileName)
+{
+    
+    cJSON *dictionaryParsed = cJSON_Parse(fileContent->c_str());
+    if(!dictionaryParsed)
+    {
+        printf("Error parsing dictonary JSON\n");
+
+    }
+
+    cJSON *nameJSON = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "name");
+    *profileName = cJSON_Print(nameJSON);
+    
+    cJSON *switchMacro = NULL;
+    cJSON *switchMacrosList = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "switchMacros");
+    if(!switchMacrosList)
+    {
+        printf("Error Getting macro list from JSON\n");
+    }
+
+    //Iterates over all switch list to get macro associated to each switch
+    cJSON_ArrayForEach(switchMacro, switchMacrosList)
+    {
+        std::list<uint8_t> macrosCodeList;
+
+        //Get switch code associated.
+        cJSON *switchCode = cJSON_GetObjectItemCaseSensitive(switchMacro, "switchCode");
+        if(!switchCode)
+        {
+            printf("Error getting switchCode\n");
+        }
+
+        // Get macroCodes to be used
+        cJSON *macrosName = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroName");
+        if(!macrosName)
+        {
+            printf("Error getting macroCodes\n");
+        }
+
+
+        (*macros)[atoi(cJSON_Print(switchCode))] = cJSON_Print(macrosName);
+        cJSON_free(switchCode);
+        cJSON_free(macrosName);
+    }
+
+    cJSON_free(nameJSON);
+    cJSON_free(switchMacro);
+    cJSON_free(switchMacrosList);
+    cJSON_free(dictionaryParsed);
+    
+
+    
 }

@@ -10,6 +10,7 @@
 
 #include <string>
 #include <list>
+#include <map>
 
 class filesManagement
 {
@@ -33,6 +34,8 @@ class filesManagement
         void getConfigFileName(std::string *fileName) {*fileName = fileConfigName;};
         // Set a new name config save file
         void setConfigFileName(std::string *fileName) {fileConfigName = *fileName;};
+        //Return a map with macro name and ID
+        void listMacroNames(std::string *fileContent, std::map<uint8_t, std::string> *macros,  std::string *profileName);
 
         //Singletone class initialization
         static filesManagement& getInstance()
