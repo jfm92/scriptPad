@@ -52,14 +52,14 @@ void ST7789V::clear(uint16_t color)
 
 }
 
-void ST7789V::draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p)
+void ST7789V::draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint8_t * color_p)
 {
 	setWindows(startX,startY,endX, endY);
 
     gpio_put(dcGPIO, 1);
     gpio_put(csGPIO, 0);
 
-    sendDataN((uint8_t *)color_p, resolutionWidth * bufferLines * 2);
+    sendDataN(color_p, resolutionWidth * bufferLines * 2);
 
     gpio_put(csGPIO, 1);
 

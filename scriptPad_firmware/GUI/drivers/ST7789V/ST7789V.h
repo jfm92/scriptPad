@@ -36,7 +36,7 @@ class ST7789V
 
         bool init(/*uint16_t height, uint16_t width*/);
         void clear(uint16_t color);
-        void draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint16_t * color_p);
+        void draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t endY, uint8_t * color_p);
 
         //Singletone class initialization
         static ST7789V& getInstance()
@@ -62,9 +62,9 @@ class ST7789V
         uint16_t resolutionHeight = 240;
         uint16_t resolutionWidth = 320;
 
-        uint64_t baudRate = 80000 * 1000; //80MHZ
+        uint64_t baudRate = 100000 * 1000; //80MHZ
 
-        uint8_t bufferLines = 10; // Num of lines to be saved
+        uint8_t bufferLines = 20; // Num of lines to be saved
 
         spi_inst_t *SPI_PORT = spi1;
 
