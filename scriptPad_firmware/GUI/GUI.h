@@ -5,6 +5,7 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "queue.h"
+#include <string>
 
 class GUI
 {
@@ -15,8 +16,11 @@ public:
     void LVGLTask();
     void setQueue(QueueHandle_t *_GUIPushQueue){GUIPushQueue = _GUIPushQueue;};
     QueueHandle_t *getQueue(){return GUIPushQueue;}
-    void GUIControl(bool _available){ controlActive = _available;};
-    bool GUIControlAvailable(){ return controlActive;};
+    void setGUIControlAvailable(bool _available){ controlActive = _available;};
+    bool getGUIControlAvailable(){ return controlActive;};
+    void GUIMoveTab(uint8_t tabNum);
+    void setHIDTask(TaskHandle_t *_HIDTask_Handle){HIDTask_Handle = _HIDTask_Handle;};
+    void setModemUSBTask(TaskHandle_t *_modemUSBTask_Handle){modemUSBTask_Handle = _modemUSBTask_Handle;};
 
     static GUI& getInstance()
         {
@@ -38,14 +42,72 @@ private:
 
     QueueHandle_t *GUIPushQueue;
 
+    TaskHandle_t *HIDTask_Handle;
+    TaskHandle_t *modemUSBTask_Handle;
+
     bool controlActive = true;
 
     lv_disp_draw_buf_t drawBuf1;
     lv_color_t buffer[320 * 10];
     lv_disp_drv_t dispDriver;
     lv_indev_drv_t inputDriver;
-    lv_indev_t * inputDriverKeypad; 
+    lv_indev_t * inputDriverKeypad;
 
+    void frontEndInit();
+    void mainScreen();
+    void webConfigScreen();
+    void macrosScreen(std::string fileName);
+    void loadMacroScreen(std::string profileName);
+    void loadWebConfigScreen();
+
+    //Screens
+    lv_obj_t *ui_mainScreen;
+    lv_obj_t *ui_macrosScreen;
+    lv_obj_t *ui_webConfigScreen;
+
+    lv_obj_t *ui_TabView2;
+    lv_obj_t *ui_profileSelectorTab;
+    lv_obj_t *ui_Roller1;
+    lv_obj_t *ui_webConfigTab;
+    lv_obj_t *ui_Button3;
+    
+    lv_obj_t *ui_macrosTab;
+    lv_obj_t *ui_Profile_Tab;
+    lv_obj_t *ui_Panel2;
+    lv_obj_t *ui_Label2;
+    lv_obj_t *ui_Panel1;
+    lv_obj_t *ui_Label1;
+    lv_obj_t *ui_Panel3;
+    lv_obj_t *ui_Label3;
+    lv_obj_t *ui_Panel4;
+    lv_obj_t *ui_Label4;
+    lv_obj_t *ui_Panel5;
+    lv_obj_t *ui_Label5;
+    lv_obj_t *ui_Panel6;
+    lv_obj_t *ui_Label6;
+    lv_obj_t *ui_Panel7;
+    lv_obj_t *ui_Label7;
+    lv_obj_t *ui_Panel8;
+    lv_obj_t *ui_Label8;
+    lv_obj_t *ui_Panel9;
+    lv_obj_t *ui_Label9;
+    lv_obj_t *ui_Panel10;
+    lv_obj_t *ui_Label11;
+    lv_obj_t *ui_Panel11;
+    lv_obj_t *ui_Label12;
+    lv_obj_t *ui_Panel12;
+    lv_obj_t *ui_Label13;
+    
+    lv_obj_t *ui_TabView4;
+    lv_obj_t *ui_Button4;
+    lv_obj_t *ui_Label10;
+    lv_obj_t *ui_TextArea1;
+    lv_obj_t *ui____initial_actions0;
+    lv_group_t * group_interact;
+
+    friend void ui_event_Roller1( lv_event_t * e);
+    friend void ui_event_Button3( lv_event_t * e);
+    friend void ui_event_Button4( lv_event_t * e);
 };
 
 
