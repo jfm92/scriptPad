@@ -1,5 +1,6 @@
 #include "pico/unique_id.h"
 #include "tusb.h"
+#include "usb_descriptor.h"
 
 enum
 {
@@ -10,8 +11,6 @@ enum
   REPORT_ID_COUNT
 };
 
-
-uint8_t webUse = 1;
 
 #define _PID_MAP(itf, n)  ( (CFG_TUD_##itf) << (n) )
 #define USB_PID           (0x4000 | _PID_MAP(CDC, 0) | _PID_MAP(MSC, 1) | _PID_MAP(HID, 2) | \
@@ -24,14 +23,24 @@ uint8_t webUse = 1;
 #define EPNUM_HID   0x81
 
 char serial[2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 1];
+char serial1[2 * PICO_UNIQUE_BOARD_ID_SIZE_BYTES + 2];
 
 static uint16_t _desc_str[32];
+
 
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "TinyUSB",                     // 1: Manufacturer
-  "TinyUSB Device",              // 2: Product
+  "scritPadHID",                     // 1: Manufacturer
+  "scriptPadHID",              // 2: Product
+  serial,                        // 3: Serials, uses the flash ID
+};
+
+char const* string_desc_arr1 [] =
+{
+  (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
+  "scritPadHID",                     // 1: Manufacturer
+  "scriptPadConfigDev",              // 2: Product
   serial,                        // 3: Serials, uses the flash ID
 };
 
@@ -86,10 +95,32 @@ tusb_desc_device_t const desc_device =
     .bNumConfigurations = 0x02
 };
 
+tusb_desc_device_t const desc_device1 =
+{
+    .bLength            = sizeof(tusb_desc_device_t),
+    .bDescriptorType    = TUSB_DESC_DEVICE,
+    .bcdUSB             = USB_BCD,
+
+    .bDeviceClass       = TUSB_CLASS_MISC,
+    .bDeviceSubClass    = MISC_SUBCLASS_COMMON,
+    .bDeviceProtocol    = MISC_PROTOCOL_IAD,
+    .bMaxPacketSize0    = CFG_TUD_ENDPOINT0_SIZE,
+
+    .idVendor           = USB_VID,
+    .idProduct          = USB_PID,
+    .bcdDevice          = 0x0101,
+
+    .iManufacturer      = 0x0F,
+    .iProduct           = 0x0F,
+    .iSerialNumber      = 0x05,
+
+    .bNumConfigurations = 0x02
+};
+
 
 uint8_t const * tud_descriptor_device_cb(void)
 {
-  return (uint8_t const *) &desc_device;
+  return (uint8_t const *) (webUse) ? &desc_device : &desc_device1;
 }
 
 uint8_t const desc_hid_report[] =
@@ -131,6 +162,7 @@ static uint8_t const * const configuration_arr[2] =
 // Descriptor contents must exist long enough for transfer to complete
 uint8_t const * tud_descriptor_configuration_cb(uint8_t index)
 {
+  printf("WebUSe %i\n", webUse);
   return (webUse == 1) ? rndis_configuration : hid_configuration;
   //return (index < CONFIG_ID_COUNT) ? configuration_arr[index] : NULL;
 }
@@ -143,7 +175,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
 
   if ( index == 0)
   {
-    memcpy(&_desc_str[1], string_desc_arr[0], 2);
+    memcpy(&_desc_str[1], (webUse == 1) ? string_desc_arr[0] :  string_desc_arr1[0], 2);
     chr_count = 1;
   }
   else if (5 == index)
@@ -166,7 +198,7 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     
     if ( !(index < sizeof(string_desc_arr)/sizeof(string_desc_arr[0])) ) return NULL;
 
-    const char* str = string_desc_arr[index];
+    const char* str =  (webUse == 1) ? string_desc_arr[index] :  string_desc_arr1[index];
 
     // Cap at max char
     chr_count = strlen(str);
@@ -183,4 +215,10 @@ uint16_t const* tud_descriptor_string_cb(uint8_t index, uint16_t langid)
   _desc_str[0] = (TUSB_DESC_STRING << 8 ) | (2*chr_count + 2);
 
   return _desc_str;
+}
+
+void Foo(bool state)
+{
+  printf("Changing set Descriptor\n");
+  webUse = state;
 }
