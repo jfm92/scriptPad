@@ -9,9 +9,6 @@
 [submodule "scriptPad_firmware/libraries/cJSON"]
 	path = scriptPad_firmware/libraries/cJSON
 	url = https://github.com/DaveGamble/cJSON
-[submodule "scriptPad_firmware/libraries/pico-filesystem"]
-	path = scriptPad_firmware/libraries/pico-filesystem
-	url = https://github.com/Memotech-Bill/pico-filesystem
 [submodule "scriptPad_firmware/libraries/LVGL"]
 	path = scriptPad_firmware/libraries/LVGL
 	url = https://github.com/lvgl/lvgl
