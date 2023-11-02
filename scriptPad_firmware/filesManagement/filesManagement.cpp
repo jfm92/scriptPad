@@ -1,27 +1,54 @@
 #include "filesManagement.h"
-#include "libraries/cJSON/cJSON.h"
+#include <stdio.h>
 #include <bits/stdc++.h>
+#include "pico/stdlib.h"
 
-void filesManagement::initFileManagement()
+#include "libraries/cJSON/cJSON.h"
+
+#include "f_util.h"
+#include "ff.h"
+#include "rtc.h"
+
+#include "hw_config.h"
+
+bool filesManagement::initFileManagement()
 {
-    ffs_pico_createcfg (&cfg, ROOT_OFFSET, ROOT_SIZE);
-    pfs = pfs_ffs_create (&cfg);
-    pfs_mount (pfs, "/");
+    bool result = false;
+
+    sd_card_t *pSD = sd_get_by_num(0);
+    if(pSD == NULL)
+    {
+        printf("PSD null\n");
+        return result;
+    }
+
+    FRESULT fr = f_mount(&pSD->fatfs, pSD->pcName, 1);
+    if(FR_OK != fr)
+    {
+        printf("Error mounting SD card: %i\n", fr);
+        return result;
+    }
+
+    printf("SD card mounted.\n");
+
+    return result;
 }
 
 bool filesManagement::readFileContent(std::string filename, std::string *fileContent) 
 {
     bool result = false;
 
-    FILE * file = fopen(filename.c_str(), "r");
-    if (file == NULL) 
+    FIL *file; 
+    FRESULT fr  = f_open(file, filename.c_str(), FA_READ);
+    if (FR_OK != fr && FR_EXIST != fr) 
     {
         printf("File openning error\r\n");
         return result;
     }
 
     char buffer[100];
-    while (fgets(buffer, sizeof(buffer), file) != NULL) {
+
+    while (f_gets(buffer, sizeof(buffer), file) != NULL) {
         *fileContent += buffer;
     }
 
@@ -30,34 +57,30 @@ bool filesManagement::readFileContent(std::string filename, std::string *fileCon
     return result;
 }
 
-bool filesManagement::createFile(std::string filename)
-{
-    bool result = false;
-
-    FILE *fd = fopen (filename.c_str() , "w");
-    if(fd != NULL)
-    {
-        printf("File %s created.\n", filename.c_str());
-        fclose (fd);
-
-        result = true;
-    }
-    
-    return result;
-}
-
 bool filesManagement::writeContentToFile(std::string filename, std::string fileContent)
 {
     bool result = false;
-    FILE* file = fopen(filename.c_str(), "w");
+    FIL *file;
 
-    if (file)
+    FRESULT fr = f_open(file, filename.c_str(), FA_OPEN_APPEND | FA_WRITE);
+    if (FR_OK != fr && FR_EXIST != fr)
     {
-        fprintf(file, fileContent.c_str());
-        fclose(file);
-        result = true;
+        printf("Error openning\n");
+        return result;
     }
 
+    if (f_printf(file, fileContent.c_str()) < 0) {
+        printf("f_printf failed\n");
+        return result;
+    }
+
+    fr = f_close(file);
+    if (FR_OK != fr) {
+        printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
+        return result;
+    }
+
+    result = true;
     return result;
 }
 
@@ -75,28 +98,33 @@ bool filesManagement::deleteFile(std::string filename)
 
 void filesManagement::listFiles(std::list<std::string> *listName)
 {
-    DIR *fsDirectory;
-    struct dirent *fsEntry;
+    FRESULT result;
+    DIR directory;
+    FILINFO fno;
 
-    fsDirectory = opendir("/");
-    if(fsDirectory == NULL)
+    //Only root folder of the SD
+    result = f_opendir(&directory, "/");
+    if (result != FR_OK) 
     {
-        //This will return 0 elements
-        printf("Error opening directory");
-        return;
+        printf("Error opnening dir\n");
     }
 
-    while((fsEntry = readdir(fsDirectory)) != NULL)
+    while(1)
     {
-        std::string auxFileName(fsEntry->d_name);
- 
-        if(!auxFileName.empty())
+        result = f_readdir(&directory, &fno);
+        
+        //Check if it's a file.
+        //TODO: Only add JSON files
+        if(fno.fattrib & AM_ARC)
         {
-            listName->push_back(auxFileName);
+            printf("Adding file\n");
+            listName->push_back(fno.fname);
         }
+
+       if(result != FR_OK || fno.fname[0] == 0) break;
     }
 
-    closedir(fsDirectory);
+    f_closedir(&directory);
 
     return;
 }
@@ -162,7 +190,4 @@ void filesManagement::listMacroNames(std::string *fileContent, std::map<uint8_t,
     cJSON_free(switchMacro);
     cJSON_free(switchMacrosList);
     cJSON_free(dictionaryParsed);
-    
-
-    
 }

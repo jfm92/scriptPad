@@ -50,8 +50,10 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/hw_config.c
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement/modemUSBManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V/ST7789V.cpp
+            #${CMAKE_CURRENT_SOURCE_DIR}/GUI/frontEnd/frontEndMain.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/GUI.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lv_conf.h
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c    
@@ -64,6 +66,7 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V
+            #${CMAKE_CURRENT_SOURCE_DIR}/GUI/frontEnd
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI
 )
 
@@ -117,8 +120,8 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON/cJSON.c
             )
 
-add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-filesystem pfs)
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/LVGL lvgl)
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src FatFs_SPI)
 
 ################################# External Libraries End ##################################################
 
@@ -129,13 +132,13 @@ add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/LVGL lvgl)
 #endif()
 
 target_link_libraries(scriptPad PUBLIC 
-                        flash_filesystem
                         pico_stdlib 
                         pico_unique_id
                         hardware_spi
                         tinyusb_device    # This is required for TinyUSB
                         tinyusb_board    # Some additional board stuff for TinyUSB
                         lvgl
+                        FatFs_SPI
                         FreeRTOS-Kernel-Heap4
                         )
 

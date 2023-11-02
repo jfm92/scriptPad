@@ -15,3 +15,7 @@
 [submodule "scriptPad_firmware/libraries/LVGL"]
 	path = scriptPad_firmware/libraries/LVGL
 	url = https://github.com/lvgl/lvgl
+[submodule "scriptPad_firmware/libraries/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico"]
+	path = scriptPad_firmware/libraries/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+	url = https://github.com/carlk3/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico
+	branch = v1.1.1
