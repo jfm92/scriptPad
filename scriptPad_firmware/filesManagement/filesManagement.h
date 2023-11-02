@@ -21,8 +21,6 @@ class filesManagement
         bool initFileManagement();
         //Try to open a file and if it exist and it's valid it returns file content
         bool readFileContent(std::string filename, std::string *fileContent);
-        //Create a new file. Returns true if it was create.
-        bool createFile(std::string filename);
         //Write content to a give file.
         bool writeContentToFile(std::string filename, std::string fileContent);
         //Delete a file giving the name

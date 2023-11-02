@@ -38,17 +38,18 @@ bool filesManagement::readFileContent(std::string filename, std::string *fileCon
 {
     bool result = false;
 
-    FIL *file; 
-    FRESULT fr  = f_open(file, filename.c_str(), FA_READ);
-    if (FR_OK != fr && FR_EXIST != fr) 
+    printf("Openning %s\n", filename.c_str());
+    FIL file; 
+    FRESULT fr  = f_open(&file, filename.c_str(), FA_READ | FA_OPEN_EXISTING);
+    if (FR_OK != fr) 
     {
-        printf("File openning error\r\n");
+        printf("File openning error %i\r\n", fr);
         return result;
     }
 
     char buffer[100];
 
-    while (f_gets(buffer, sizeof(buffer), file) != NULL) {
+    while (f_gets(buffer, sizeof(buffer), &file) != NULL) {
         *fileContent += buffer;
     }
 
@@ -60,21 +61,21 @@ bool filesManagement::readFileContent(std::string filename, std::string *fileCon
 bool filesManagement::writeContentToFile(std::string filename, std::string fileContent)
 {
     bool result = false;
-    FIL *file;
+    FIL file;
 
-    FRESULT fr = f_open(file, filename.c_str(), FA_OPEN_APPEND | FA_WRITE);
+    FRESULT fr = f_open(&file, filename.c_str(), FA_OPEN_APPEND | FA_WRITE);
     if (FR_OK != fr && FR_EXIST != fr)
     {
         printf("Error openning\n");
         return result;
     }
 
-    if (f_printf(file, fileContent.c_str()) < 0) {
+    if (f_printf(&file, fileContent.c_str()) < 0) {
         printf("f_printf failed\n");
         return result;
     }
 
-    fr = f_close(file);
+    fr = f_close(&file);
     if (FR_OK != fr) {
         printf("f_close error: %s (%d)\n", FRESULT_str(fr), fr);
         return result;
@@ -117,8 +118,12 @@ void filesManagement::listFiles(std::list<std::string> *listName)
         //TODO: Only add JSON files
         if(fno.fattrib & AM_ARC)
         {
-            printf("Adding file\n");
-            listName->push_back(fno.fname);
+            printf("Adding file %s\n", fno.fname);
+
+            std::string fileNameAux = std::string(fno.fname);
+            if(!fileNameAux.empty()){
+                listName->push_back(fileNameAux);
+            } 
         }
 
        if(result != FR_OK || fno.fname[0] == 0) break;
