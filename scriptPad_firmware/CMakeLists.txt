@@ -11,6 +11,10 @@ set(PICO_SDK_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/pico-sdk")
 set(FREERTOS_KERNEL_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libraries/FreeRTOS-Kernel")
 set(LV_CONF_PATH "${CMAKE_CURRENT_SOURCE_DIR}/GUI/")
 
+set(PICO_CXX_ENABLE_EXCEPTIONS 1)
+
+set(PICO_CXX_ENABLE_RTTI 1)
+
 
 include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
@@ -55,6 +59,7 @@ target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V/ST7789V.cpp
             #${CMAKE_CURRENT_SOURCE_DIR}/GUI/frontEnd/frontEndMain.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/GUI.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/backLightManagement/backLightManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/lv_conf.h
             ${CMAKE_CURRENT_SOURCE_DIR}/usb_descriptors.c    
 )   
@@ -66,6 +71,7 @@ target_include_directories(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/modemUSBManagement
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI/drivers/ST7789V
+            ${CMAKE_CURRENT_SOURCE_DIR}/backLightManagement
             #${CMAKE_CURRENT_SOURCE_DIR}/GUI/frontEnd
             ${CMAKE_CURRENT_SOURCE_DIR}/GUI
 )
@@ -122,6 +128,7 @@ target_sources(scriptPad PUBLIC
 
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/LVGL lvgl)
 add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/no-OS-FatFS-SD-SDIO-SPI-RPi-Pico/src FatFs_SPI)
+add_subdirectory (${CMAKE_CURRENT_SOURCE_DIR}/libraries/PicoLED PicoLed)
 
 ################################# External Libraries End ##################################################
 
@@ -139,6 +146,7 @@ target_link_libraries(scriptPad PUBLIC
                         tinyusb_board    # Some additional board stuff for TinyUSB
                         lvgl
                         FatFs_SPI
+                        PicoLed
                         FreeRTOS-Kernel-Heap4
                         )
 
