@@ -19,3 +19,6 @@
 [submodule "scriptPad_firmware/libraries/PicoLED"]
 	path = scriptPad_firmware/libraries/PicoLED
 	url = https://github.com/ForsakenNGS/PicoLED
+[submodule "scriptPad_firmware/libraries/tinyusb"]
+	path = scriptPad_firmware/libraries/tinyusb
+	url = https://github.com/jfm92/tinyusb
