@@ -18,7 +18,7 @@ set(PICO_CXX_ENABLE_RTTI 1)
 
 include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
 include(${FREERTOS_KERNEL_PATH}/portable/ThirdParty/GCC/RP2040/FreeRTOS_Kernel_import.cmake)
-include(${PICO_SDK_PATH}/lib/tinyusb/hw/bsp/family_support.cmake)
+include(${CMAKE_CURRENT_SOURCE_DIR}/libraries/tinyusb/hw/bsp/family_support.cmake)
 
 project(scriptPad C CXX ASM)
 
@@ -84,7 +84,7 @@ target_include_directories(scriptPad PUBLIC
             ${PICO_SDK_PATH}/lib/lwip/src/include
             ${PICO_SDK_PATH}/lib/lwip/src/include/ipv4
             ${PICO_SDK_PATH}/lib/lwip/src/include/lwip/apps
-            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/tinyusb/lib/networking
             )
 
 target_sources(scriptPad PUBLIC
@@ -120,9 +120,9 @@ target_sources(scriptPad PUBLIC
             ${PICO_SDK_PATH}/lib/lwip/src/netif/slipif.c
             ${PICO_SDK_PATH}/lib/lwip/src/apps/http/httpd.c
             ${PICO_SDK_PATH}/lib/lwip/src/apps/http/fs.c
-            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/dhserver.c
-            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/dnserver.c
-            ${PICO_SDK_PATH}/lib/tinyusb/lib/networking/rndis_reports.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/tinyusb/lib/networking/dhserver.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/tinyusb/lib/networking/dnserver.c
+            ${CMAKE_CURRENT_SOURCE_DIR}/libraries/tinyusb/lib/networking/rndis_reports.c
             ${CMAKE_CURRENT_SOURCE_DIR}/libraries/cJSON/cJSON.c
             )
 

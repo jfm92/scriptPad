@@ -1,4 +1,4 @@
-#include "bsp/board.h"
+#include "bsp/board_api.h"
 #include "tusb.h"
 
 #include "dhserver.h"
@@ -33,7 +33,7 @@ static ip4_addr_t ipaddr;
 static ip4_addr_t netmask;
 static ip4_addr_t gateway;
 //No other way to set MAC Address, it must be harcoded in this way...
-const uint8_t tud_network_mac_address[6] = {0x02,0x02,0x84,0x6A,0x96,0x00};
+uint8_t tud_network_mac_address[6] = {0x02,0x02,0x84,0x6A,0x96,0x00};
 
 
 /************************** TinyUSB CallBacks *********************************/
