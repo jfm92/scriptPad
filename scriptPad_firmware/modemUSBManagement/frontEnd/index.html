@@ -1,46 +1,31 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Post Test</title>
-</head>
-<body>
-  <h1>Post Test</h1>
-  <button id="send">Send Number</button>
-  <input type="number" id="number" placeholder="Set a number">
-  <script>
-    const button = document.getElementById('send');
-    const input = document.getElementById('number');
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>scriptPad</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="header">
+            <h1>scriptPad</h1>
+        </div>
 
-    button.addEventListener('click', () => {
-    const numero = input.value;
-    fetch('/send_number', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json', // Indicar que estás enviando JSON
-      },
-      body: JSON.stringify({
-        "name": "Awesome 4K",
-        "resolutions":  [{
-                        "width":        1111,
-                        "height":       22222
-                }, {
-                        "width":        3333,
-                        "height":       4444
-                }, {
-                        "width":        55555,
-                        "height":       66666
-                }]
-}
-), // Enviar el número como JSON
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  });
-  </script>
-</body>
+        <div id="sideBar">
+            <div id="profileTag">
+                <label for="profileTagInput">Add new profile</label>
+                <input type="text" id="profileTagInput">
+
+            </div>
+            <div id="profileTagList"></div>
+        </div>
+
+        <div id="content">
+            <div id="profileTitle"></div>
+            <div id="screen"></div>
+        </div>
+    
+
+        <script src="script.js"></script>
+    </body>
 </html>
