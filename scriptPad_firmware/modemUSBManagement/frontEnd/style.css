@@ -51,7 +51,14 @@ body {
     box-sizing: border-box;
 }
 
-#macrosArrayButtons {
+
+#screen {
+    text-align: center;
+    visibility:hidden;
+}
+
+.macroSwitch
+{
     margin-top: 20px;
     margin-left: 20px;
     padding: 15px;
@@ -62,8 +69,4 @@ body {
     text-align: center;
     font-weight: bold;
     font-size: large;
-}
-
-#screen {
-    text-align: center;
 }
