@@ -15,6 +15,9 @@
 #include "modemUSBManagement.h"
 #include "../filesManagement/filesManagement.h"
 
+#include <string>
+#include "libraries/cJSON/cJSON.h"
+
 #define INIT_IP4(a,b,c,d) { PP_HTONL(LWIP_MAKEU32(a,b,c,d)) }
 
 ////////////////////////////////////////////////////////
@@ -76,7 +79,8 @@ uint16_t tud_network_xmit_cb(uint8_t *dst, void *ref, uint16_t arg)
 /************************** API POST CallBacks *********************************/
 void httpd_post_finished(void *connection, char *response_uri, u16_t response_uri_len)
 {
-
+  printf("Sending response\n");
+  snprintf(response_uri, response_uri_len, "/saveConfig");
 }
 
 err_t httpd_post_begin(void *connection, const char *uri, const char *http_request,
@@ -88,7 +92,32 @@ err_t httpd_post_begin(void *connection, const char *uri, const char *http_reque
 
 err_t httpd_post_receive_data(void *connection, struct pbuf *p)
 {
-  return ERR_OK;
+  filesManagement& FSmanagementInstance = filesManagement::getInstance();
+
+  std::string fileContent(static_cast<char*>(p->payload));
+
+  //We need to parse incoming file to be sure if it's a valid json file
+  cJSON *incomingData = cJSON_Parse(fileContent.c_str());
+  if(!incomingData)
+  {
+    printf("Error parsing incomingData JSON\n");
+    return ERR_VAL;
+  }
+
+  cJSON *nameJSON = cJSON_GetObjectItemCaseSensitive(incomingData, "profileName");
+  
+  std::string fileName(cJSON_PrintUnformatted(nameJSON));
+  fileName = fileName.substr(1, fileName.size() - 2);
+  fileName += ".json";
+
+  //Create a new file with profile name and json content
+  bool fsResult = FSmanagementInstance.writeContentToFile(fileName.c_str(), fileContent);
+
+  printf("Saved new file: %s\n", fileName.c_str());
+
+  cJSON_Delete(incomingData);
+
+  return fsResult ? ERR_OK : ERR_VAL;
 }
 
 
