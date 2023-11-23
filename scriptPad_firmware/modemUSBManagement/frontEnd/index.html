@@ -1,47 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>scriptPad</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div id="header">
-            <h1>scriptPad</h1>
-        </div>
-
-        <div id="sideBar">
-            <div id="profileTag">
-                <label for="profileTagInput">Add new profile</label>
-                <input type="text" id="profileTagInput">
-                <button onclick="newProfileTag()" id="addProfile">+</button>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>scriptPad config</title>
+</head>
+<body>
+    <div class="container">
+        <!--<div class="Header">
+            <h2>scriptPad config</h2>
+        </div>-->
+        <div class="profilesListContainer">
+            <h2>Profiles</h2>
+            <div class="profileRow">
+                <input type="text" class="inputBox" id="profileInputBox" placeholder="Add new profile">
+                <button class = "buttonAdd" id = "profileAddBtn" onclick="addTask()">Add</button>
             </div>
-            <div id="profileTagList"></div>
+            <ul id="profileList"></ul>
         </div>
-
-        <div id="content">
-            <div id="profileTitle"></div>
-            <div id="screen">
-                <button class="macroSwitch" id="0"></button>
-                <button class="macroSwitch" id="1"></button>
-                <button class="macroSwitch" id="2"></button>
-                <button class="macroSwitch" id="3"></button>
-                <br>
-                <button class="macroSwitch" id="4"></button>
-                <button class="macroSwitch" id="5"></button>
-                <button class="macroSwitch" id="6"></button>
-                <button class="macroSwitch" id="7"></button>
-                <br>
-                <button class="macroSwitch" id="8"></button>
-                <button class="macroSwitch" id="9"></button>
-                <button class="macroSwitch" id="10"></button>
-                <button class="macroSwitch" id="11"></button>
-                <br>
-            </div>
+        <div class="matrixContainer">
+            <form onsubmit="return false;">
+                <div id="matrixTitle">
+                    <h2></h2>
+                </div>
+                <div>
+                    <button class="matrixButton" onclick="matrixButtonClick(0)" id="0"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(1)" id="1"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(2)" id="2"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(3)" id="3"></button>
+                </div>
+                <div>
+                    <button class="matrixButton" onclick="matrixButtonClick(4)" id="4"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(5)" id="5"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(6)" id="6"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(7)" id="7"></button>
+                </div>
+                <div>
+                    <button class="matrixButton" onclick="matrixButtonClick(8)" id="8"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(9)" id="9"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(10)" id="10"></button>
+                    <button class="matrixButton" onclick="matrixButtonClick(11)" id="11"></button>
+                </div>
+                <div class="matrixNaming">
+                    <input type="text" class="inputBox" id="matrixNewNameInputBox" placeholder="New profile name">
+                    <button class = "buttonAdd" id= "applyChangeNameBtn" onclick="updateProfileName()">Apply</button>
+                </div>
+                <div class="matrixBackground">
+                    <select id="matrixBCKEffectsDropdown">
+                        <option>Solid</option>
+                        <option>Fade</option>
+                        <option>Rainbow</option>
+                        <option>ColorWave</option>
+                    </select>
+                    <input type="color" class="macroBckColorInput" id="colorPrim" value="#000000">
+                    <input type="color" class="macroBckColorInput" id="colorSec"  value="#000000">
+                    <button class = "buttonAdd" id= "applyChangeColorBtn" onclick="saveBackgroundEffect()">Apply</button>
+                </div>
+                <div class="matrixSaveChanges">
+                    <button class = "buttonAdd" id= "saveMatrixBtn" onclick="saveProfile()">Save changes</button>
+                </div>
+            </form>
         </div>
-    
-
-        <script src="script.js"></script>
-    </body>
+        <div class="switchConfigurationContainer">
+            <form onsubmit="return false;">
+                <div id="switchConfigTitle">
+                    <h2></h2>
+                </div>
+                <div>
+                    <input type="text" class="inputBox" id="switchConfigInputBox" placeholder="Macro Name">
+                    <button class = "buttonAdd" id = "newMacroNameAdd" onclick="updateMacroName()">Apply</button>
+                </div>
+                <div>
+                    <label>Background color</label>
+                    <input type="color" class="macroBckColorInput" id="switchBackground" value="#000000">
+                    <button class = "buttonAdd" id= "applyChangeColorBtn" onclick="updateSwitchColor()">Apply</button>
+                </div>
+                <div>
+                    <input type="text" class="inputBox" id="switchMacroTextInputBox" placeholder="macro Text">
+                    <button class = "buttonAdd" id = "addNewMacroText" onclick="addMacro(true)">Add</button>
+                </div>
+                <div>
+                    <select id="switchKeyMacroSelect"></select>
+                    <button class = "buttonAdd" id = "profileButtonAdd" onclick="addMacro(false)">Add</button>
+                </div>
+                <div>
+                    <ul id="macroList"></ul>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
 </html>

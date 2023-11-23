@@ -1,72 +1,221 @@
-body {
+*{
     margin: 0;
-    font-family: Arial, sans-serif;
-}
-
-#header {
-    background-color: #333;
-    color: #fff;
-    padding: 15px;
-    text-align: center;
-}
-
-#sideBar {
-    width: 250px;
-    background-color: #ebb400;
-    padding: 15px;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
     box-sizing: border-box;
-    float: left;
-    height: calc(100vh - 60px);
-    overflow-y: auto;
-    text-align: center;
-    color: aliceblue;
-    font-family: Arial, sans-serif;
 }
 
+.container {  
+    display: grid;
+    grid-template-columns: 0.6fr 1.2fr 1.2fr;
+    grid-template-rows: 0.2fr 1.5fr 1.3fr;
+    gap: 0px 0px;
+    grid-auto-flow: row;
+    background: linear-gradient(135deg, #153677, #4e085f);
+    width: 100%;
+    min-height: 100vh;
+    padding: 10px;
+  }
+  
+.Header { 
+    grid-area: 1 / 1 / 2 / 4;
+}
 
-#profileTag {
+.Header h2 {
+    color: #edeef0;
+    text-align: center;
+    font-size: 40px;
+    padding: 1%;
+}
+  
+.profilesListContainer { 
+    grid-area: 1 / 1 / 4 / 2;
+    width: 100%;
+    max-width: 350px;
+    background: #fff;
+    padding: 40px 10px 0px;
+    margin-left: 10%;
+    margin-top: 5%;
+    border-radius: 10px; 
+}
+
+.profilesListContainer h2{
+    color: #002765;
+    align-items: center;
     margin-bottom: 15px;
 }
 
-
-#profileTagList {
-    cursor: pointer;
-    background-color: #333;
-    width: 250px;
-    color: #fff;
-    text-align: center;
-    margin-top: 10px;
+.profileRow{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #edeef0;
+    border-radius: 30px;
+    padding-left: 15px;
+    margin-bottom: 25px;
 }
 
-#profileTitle {
+.inputBox{
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 10px;
+    font-weight: 10px;
+}
+
+.buttonAdd{
+    border: none;
+    outline: none;
+    padding: 10px 30px;
+    background: #ff5945;
+    color: #fff;
+    font-size: 11px;
+    cursor: pointer;
+    border-radius: 40px;
+}
+
+ul li{
+    list-style: none;
+    font-size: 17px;
+    padding-left: 15px;
+    padding-bottom: 10px;
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+}
+
+ul li.checked{
+    color: #ff5945;
+    font-style:italic;
+}
+
+ul li span{
+    position: absolute;
+    right: 0;
+    top: 5px;
+    width: 40px;
+    height: 40px;
+    font-size: 22px;
+    color: #555;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+}
+
+ul li span:hover{
+    background: #edeef0; 
+}
+
+.matrixContainer { 
+    grid-area: 1 / 2 / 3 / 4; 
+    width: 100%;
+    max-width: 70%;
+    background: #fff;
+    padding: 10px 10px 10px 10px;
+    margin-left: 15%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#matrixTitle{
+    color: #002765;
+    font-size: 30px;
     text-align: center;
     font-weight: bold;
-    font-size: 50px;
-    margin-top: 10px;
-}
-
-#content {
-    margin-left: 200px;
-    padding: 15px;
-    box-sizing: border-box;
+    margin-bottom: 15px;
+    margin-top: 0px;
 }
 
 
-#screen {
-    text-align: center;
-    visibility:hidden;
-}
-
-.macroSwitch
-{
-    margin-top: 20px;
-    margin-left: 20px;
-    padding: 15px;
+.matrixButton{
     cursor: pointer;
-    width: 80px;
-    height: 80px;
-    background-size: cover;
+    width: 75px;
+    height: 75px;
+    margin: 10px;
     text-align: center;
     font-weight: bold;
     font-size: large;
+    border-radius: 10px;
+    border: 0;
+    outline: 0;
+    box-shadow: 0 0 20px rgba(#000000,0);
 }
+
+.matrixNaming{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edeef0;
+    border-radius: 30px;
+    padding-left: 15px;
+    margin-top: 25px;
+}
+
+.matrixBackground{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #edeef0;
+    border-radius: 30px;
+    padding-left: 15px;
+    margin-top: 25px;
+}
+
+#matrixBCKEffectsDropdown{
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 5px;
+    font-weight: 10px;
+}
+
+.macroBckColorInput{
+    border: none;
+    outline: none;
+    background: transparent;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+#colorSec{
+    display: none;
+}
+
+
+.matrixSaveChanges{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 25px;
+}
+
+
+.switchConfigurationContainer {  
+    grid-area: 3 / 2 / 4 / 4; 
+    width: 100%;
+    max-width: 70%;
+    background: #fff;
+    padding: 10px 10px 10px 10px;
+    margin-left: 15%;
+    margin-top: 2%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+
+#switchConfigTitle{
+    color: #002765;
+    font-size: 30px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 15px;
+    margin-top: 0px;
+}
+
