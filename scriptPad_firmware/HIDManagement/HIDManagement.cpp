@@ -65,8 +65,8 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
 {
     bool succeed = false;
     cJSON *codeKey;
+    cJSON *codeKeySubArray;
     cJSON *macroCodes;
-    cJSON *switchCode;
 
     cJSON *dictionaryParsed = cJSON_Parse(dataJSON);
     if(!dictionaryParsed)
@@ -108,8 +108,18 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
         {
             //Get each element of the array
             codeKey = cJSON_GetArrayItem(macroCodes, i);
-            macrosCodeList.push_back(atoi(cJSON_Print(codeKey)));
-           // cJSON_free(codeKey);
+
+            //Some elements of the array might contain an sub array.
+            //This is used for text option
+            if(cJSON_GetArraySize(codeKey) > 1){
+                for(int i = 0; i < cJSON_GetArraySize(codeKey); ++i){
+                    codeKeySubArray = cJSON_GetArrayItem(codeKey, i);
+                    macrosCodeList.push_back(atoi(cJSON_Print(codeKeySubArray)));
+                }
+            }
+            else{
+                macrosCodeList.push_back(atoi(cJSON_Print(codeKey)));
+            }
         }
 
         //Asociate each switchCode with macroCodeList
@@ -142,6 +152,7 @@ void HIDManagement::sendAction()
     {
         uint8_t keycodeArray[6] = { 0 };
         uint8_t keyArrayIndex = 0;
+        uint8_t keyCodePrev = 0x00;
         bool previousSend = false;
 
         //Get last keyStroke
@@ -151,39 +162,53 @@ void HIDManagement::sendAction()
         //This loops iterates over the keys list associated to switch
         for(auto keyCode : macrosDictionary[switchNum])
         {
-            keycodeArray[keyArrayIndex] = keyCode;
-            ++ keyArrayIndex; 
+            if(keyCode == 00){ //It's a code to wait 10 ms
+                sendReport(keycodeArray, previousSend, 0x00);
+                previousSend = true;
+
+                //Clean Array
+                keyArrayIndex = 0;
+                memset(keycodeArray, 0, sizeof(keycodeArray) );
+
+                vTaskDelay(pdMS_TO_TICKS(10));
+            }
+            else if(keyCodePrev ==  keyCode){
+                //If you're sending duplicated key, it will only send the first on report
+                //with this work around it's possible to send unlimited copies
+                sendReport(keycodeArray, previousSend, 0x00);
+                previousSend = true;
+
+                //Clean Array
+                keyArrayIndex = 0;
+                memset(keycodeArray, 0, sizeof(keycodeArray) );
+
+                keycodeArray[keyArrayIndex] = keyCode;
+                keyCodePrev = keyCode;
+                ++ keyArrayIndex; 
+            }
+            else{
+                keycodeArray[keyArrayIndex] = keyCode;
+                keyCodePrev = keyCode;
+                ++ keyArrayIndex; 
+            }
+           
 
             //This is a limitation of the tinyUSB library that only allows to send 6 elements on each inform
             if(keyArrayIndex > 5)
             {
-                if(previousSend)
-                {
-                    // If we already send an inform with information, we need to send a empty one;
-                    vTaskDelay(10 / portTICK_PERIOD_MS);
-                    tud_hid_keyboard_report(1, 0, NULL); 
-                    vTaskDelay(10 / portTICK_PERIOD_MS);
-                }
-                tud_hid_keyboard_report(1, 0, keycodeArray); //TODO: CHange 1 to KEYBOARD code
+                sendReport(keycodeArray, previousSend, 0x00);
                 previousSend = true;
 
+                //Clean Array
                 keyArrayIndex = 0;
-                memset(keycodeArray, 0, sizeof(keycodeArray));
+                memset(keycodeArray, 0, sizeof(keycodeArray) );
             }
         }
         
         //Sending Leftovers
         if(keyArrayIndex != 0)
         {
-            if(previousSend)
-            {
-                // If we already send an inform with information, we need to send a empty one;
-                vTaskDelay(10 / portTICK_PERIOD_MS);
-                tud_hid_keyboard_report(1, 0, NULL); 
-                vTaskDelay(10 / portTICK_PERIOD_MS);
-            }
-
-            tud_hid_keyboard_report(1, 0, keycodeArray);
+            sendReport(keycodeArray, previousSend, 0x00);
         }
 
         has_keyboard_key = true;
@@ -194,5 +219,17 @@ void HIDManagement::sendAction()
         if (has_keyboard_key) tud_hid_keyboard_report(1, 0, NULL); //TODO: Change report ID to keyboard
         has_keyboard_key = false;
     }
+}
+
+void HIDManagement::sendReport(uint8_t *codeArray, bool previousSend, uint8_t deviceType)
+{
+     if(previousSend)
+    {
+        // If we already send an inform with information, we need to send a empty one;
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+        tud_hid_keyboard_report(1, 0, NULL); 
+        vTaskDelay(10 / portTICK_PERIOD_MS);
+    }
+    tud_hid_keyboard_report(1, 0, codeArray); //TODO: CHange 1 to KEYBOARD code
 }
 

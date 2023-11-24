@@ -53,6 +53,8 @@ class HIDManagement
         HIDManagement(){};
         // Send action to host device (Keyboard, mouse, HID)
         void sendAction();
+        // Inner function to send report
+        void sendReport(uint8_t *codeArray, bool previousSend, uint8_t deviceType);
 
         friend void informTimerCB(TimerHandle_t xTimer);
         friend uint16_t tud_hid_get_report_cb(uint8_t instance, 
