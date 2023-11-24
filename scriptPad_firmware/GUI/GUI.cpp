@@ -58,7 +58,6 @@ static void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
 
     if(keyPressed)
     {
-        printf("Pressed enter\n");
         data->state = LV_INDEV_STATE_PRESSED;
         keyPressed=!keyPressed;
     }
@@ -83,7 +82,6 @@ void ui_event_Button3( lv_event_t * e) {
     lv_obj_t * target = lv_event_get_target(e);
 
     if ( event_code == LV_EVENT_CLICKED) {
-        printf("button 3\n");
         GUIInstance.loadWebConfigScreen();
     }
 }
@@ -159,8 +157,8 @@ void GUI::LVGLTask()
 
 void GUI::GUIMoveTab(uint8_t tabNum)
 {
-    lv_tabview_set_act(ui_TabView2, tabNum, LV_ANIM_ON);
-    lv_group_focus_obj((tabNum) ? ui_Button3 : ui_Roller1);
+    lv_tabview_set_act(ui_optionsTab, tabNum, LV_ANIM_ON);
+    lv_group_focus_obj((tabNum) ? ui_webConfigBtn : ui_profilesRoller);
 }
 
 void GUI::mainScreen(void)
@@ -172,13 +170,13 @@ void GUI::mainScreen(void)
     ui_mainScreen = lv_obj_create(NULL);
     lv_obj_clear_flag( ui_mainScreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
 
-    ui_TabView2 = lv_tabview_create(ui_mainScreen, LV_DIR_TOP, 50);
-    lv_obj_set_width( ui_TabView2, 320);
-    lv_obj_set_height( ui_TabView2, 240);
-    lv_obj_set_align( ui_TabView2, LV_ALIGN_TOP_MID );
-    lv_obj_clear_flag( ui_TabView2, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+    ui_optionsTab = lv_tabview_create(ui_mainScreen, LV_DIR_TOP, 50);
+    lv_obj_set_width( ui_optionsTab, 320);
+    lv_obj_set_height( ui_optionsTab, 240);
+    lv_obj_set_align( ui_optionsTab, LV_ALIGN_TOP_MID );
+    lv_obj_clear_flag( ui_optionsTab, LV_OBJ_FLAG_SCROLLABLE );
 
-    ui_profileSelectorTab = lv_tabview_add_tab(ui_TabView2, "Profiles");
+    ui_profileSelectorTab = lv_tabview_add_tab(ui_optionsTab, "Profiles");
     
     filesManagement& filesControl = filesManagement::getInstance();
     filesControl.listFiles(&filesList);
@@ -188,41 +186,46 @@ void GUI::mainScreen(void)
         fileListNames += fileName + '\n';
     }
 
-    ui_Roller1 = lv_roller_create(ui_profileSelectorTab);
-    lv_roller_set_options( ui_Roller1, fileListNames.c_str(), LV_ROLLER_MODE_NORMAL );
-    lv_obj_set_width( ui_Roller1, 200);
-    lv_obj_set_height( ui_Roller1, 150);
-    lv_obj_set_align( ui_Roller1, LV_ALIGN_TOP_MID );
+    ui_profilesRoller = lv_roller_create(ui_profileSelectorTab);
+    lv_roller_set_options( ui_profilesRoller, fileListNames.c_str(), LV_ROLLER_MODE_NORMAL );
+    lv_obj_set_width( ui_profilesRoller, 200);
+    lv_obj_set_height( ui_profilesRoller, 150);
+    lv_obj_set_align( ui_profilesRoller, LV_ALIGN_TOP_MID );
 
-    lv_group_add_obj(group_interact, ui_Roller1);
+    lv_group_add_obj(group_interact, ui_profilesRoller);
 
-    ui_webConfigTab = lv_tabview_add_tab(ui_TabView2, "Web Config");
+    ui_webConfigTab = lv_tabview_add_tab(ui_optionsTab, "Web Config");
 
-    ui_Button3 = lv_btn_create(ui_webConfigTab);
-    lv_obj_set_width( ui_Button3, 100);
-    lv_obj_set_height( ui_Button3, 50);
-    lv_obj_set_align( ui_Button3, LV_ALIGN_CENTER );
-    lv_obj_add_flag( ui_Button3, LV_OBJ_FLAG_SCROLL_ON_FOCUS );
-    lv_obj_add_flag( ui_Button3, LV_OBJ_FLAG_CLICKABLE );   /// Flags
-    lv_obj_clear_flag( ui_Button3, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+    ui_webConfigBtn = lv_btn_create(ui_webConfigTab);
+    lv_obj_set_width( ui_webConfigBtn, 100);
+    lv_obj_set_height( ui_webConfigBtn, 50);
+    lv_obj_set_align( ui_webConfigBtn, LV_ALIGN_CENTER );
+    lv_obj_add_flag( ui_webConfigBtn, LV_OBJ_FLAG_SCROLL_ON_FOCUS );
+    lv_obj_add_flag( ui_webConfigBtn, LV_OBJ_FLAG_CLICKABLE );
+    lv_obj_clear_flag( ui_webConfigBtn, LV_OBJ_FLAG_SCROLLABLE ); 
 
-    lv_group_add_obj(group_interact, ui_Button3);
+    lv_obj_t *webConfigLabel = lv_label_create(ui_webConfigBtn);
+    lv_label_set_text(webConfigLabel, "Configuration");
+    lv_label_set_long_mode(webConfigLabel, LV_LABEL_LONG_SCROLL_CIRCULAR);
+    lv_obj_align(webConfigLabel, LV_ALIGN_CENTER, 0, 0);
 
-    lv_obj_add_event_cb(ui_Roller1, &ui_event_Roller1, LV_EVENT_ALL, NULL);
-    lv_obj_add_event_cb(ui_Button3, &ui_event_Button3, LV_EVENT_ALL, NULL);
+    lv_group_add_obj(group_interact, ui_webConfigBtn);
+
+    lv_obj_add_event_cb(ui_profilesRoller, &ui_event_Roller1, LV_EVENT_ALL, NULL);
+    lv_obj_add_event_cb(ui_webConfigBtn, &ui_event_Button3, LV_EVENT_ALL, NULL);
 
 }
 
 void GUI::webConfigScreen()
 {
-       ui_webConfigScreen = lv_obj_create(NULL);
-    lv_obj_clear_flag( ui_webConfigScreen, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+    ui_webConfigScreen = lv_obj_create(NULL);
+    lv_obj_clear_flag( ui_webConfigScreen, LV_OBJ_FLAG_SCROLLABLE );
 
-    ui_TabView4 = lv_tabview_create(ui_webConfigScreen, LV_DIR_TOP, 50);
+    ui_TabView4 = lv_tabview_create(ui_webConfigScreen, LV_DIR_TOP, 25);
     lv_obj_set_width( ui_TabView4, 320);
     lv_obj_set_height( ui_TabView4, 240);
     lv_obj_set_align( ui_TabView4, LV_ALIGN_CENTER );
-    lv_obj_clear_flag( ui_TabView4, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+    lv_obj_clear_flag( ui_TabView4, LV_OBJ_FLAG_SCROLLABLE );
 
 
     ui_webConfigTab = lv_tabview_add_tab(ui_TabView4, "webConfig");
@@ -231,15 +234,15 @@ void GUI::webConfigScreen()
     lv_obj_set_width( ui_Button4, 150);
     lv_obj_set_height( ui_Button4, 50);
     lv_obj_set_align( ui_Button4, LV_ALIGN_BOTTOM_MID );
-    lv_obj_add_flag( ui_Button4, LV_OBJ_FLAG_SCROLL_ON_FOCUS );   /// Flags
-    lv_obj_clear_flag( ui_Button4, LV_OBJ_FLAG_SCROLLABLE );    /// Flags
+    lv_obj_add_flag( ui_Button4, LV_OBJ_FLAG_SCROLL_ON_FOCUS );
+    lv_obj_clear_flag( ui_Button4, LV_OBJ_FLAG_SCROLLABLE );
     lv_obj_set_style_bg_color(ui_Button4, lv_color_hex(0xCA2222), LV_PART_MAIN | LV_STATE_DEFAULT );
     lv_obj_set_style_bg_opa(ui_Button4, 255, LV_PART_MAIN| LV_STATE_DEFAULT);
     lv_group_add_obj(group_interact, ui_Button4);
 
     ui_Label10 = lv_label_create(ui_Button4);
-    lv_obj_set_width( ui_Label10, LV_SIZE_CONTENT);  /// 1
-    lv_obj_set_height( ui_Label10, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_width( ui_Label10, LV_SIZE_CONTENT);
+    lv_obj_set_height( ui_Label10, LV_SIZE_CONTENT);
     lv_obj_set_align( ui_Label10, LV_ALIGN_CENTER );
     lv_label_set_text(ui_Label10,"Close config mode");
 
@@ -300,17 +303,61 @@ void GUI::macrosScreen(std::string fileName)
     lv_obj_set_height( ui_Panel2, 35);
     lv_obj_clear_flag( ui_Panel2, LV_OBJ_FLAG_SCROLLABLE );
 
+    //This build macro screen
     for(auto macro :macroList )
     {
-        lv_obj_t * btn_emulator_lib = lv_btn_create(ui_Profile_Tab);
-        lv_obj_align(btn_emulator_lib, macro.first, 0, 0);
-        lv_obj_set_size(btn_emulator_lib,80,35);
+        lv_obj_t * macroButton = lv_btn_create(ui_Profile_Tab);
+        
+        //Set exact position for each button
+        switch ( macro.first)
+        {
+            case 0:
+                lv_obj_align(macroButton, LV_ALIGN_TOP_LEFT, 0, -10);
+            break;
+            case 1:
+                lv_obj_align(macroButton, LV_ALIGN_TOP_MID, -40, -10);
+            break;
+            case 2:
+                lv_obj_align(macroButton, LV_ALIGN_TOP_MID, 40, -10);
+            break;
+            case 3:
+                lv_obj_align(macroButton, LV_ALIGN_TOP_RIGHT, 0, -10);
+            break;
+            case 4:
+                lv_obj_align(macroButton, LV_ALIGN_LEFT_MID, 0, 0);
+            break;
+            case 5:
+                lv_obj_align(macroButton, LV_ALIGN_CENTER, -40, 0);
+            break;
+            case 6:
+                lv_obj_align(macroButton, LV_ALIGN_CENTER, 40, 0);
+            break;
+            case 7:
+                lv_obj_align(macroButton, LV_ALIGN_RIGHT_MID, 0, 0);
+            break;
+            case 8:
+                lv_obj_align(macroButton, LV_ALIGN_BOTTOM_LEFT, 0, 10);
+            break;
+            case 9:
+                lv_obj_align(macroButton, LV_ALIGN_BOTTOM_MID, -40, 10);
+            break;
+            case 10:
+                lv_obj_align(macroButton, LV_ALIGN_BOTTOM_MID, 40, 10);
+            break;
+            case 11:
+                lv_obj_align(macroButton, LV_ALIGN_BOTTOM_RIGHT, 0, 10);
+            break;
+            default:
+            break;
+        }
 
-        lv_obj_t * label = lv_label_create(btn_emulator_lib );
+        lv_obj_set_size(macroButton,55,55);
+
+        lv_obj_t * label = lv_label_create(macroButton);
         lv_label_set_text(label, macro.second.c_str());
         lv_label_set_long_mode(label, LV_LABEL_LONG_SCROLL_CIRCULAR);
-        lv_obj_set_width(label, 80);
-        lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
+        lv_obj_set_width(label, 55);
+        lv_obj_align(label, LV_ALIGN_CENTER, 12, 0); //Necessary to apply this offset
     }
 }
 

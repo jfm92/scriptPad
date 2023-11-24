@@ -65,11 +65,11 @@ private:
     lv_obj_t *ui_macrosScreen;
     lv_obj_t *ui_webConfigScreen;
 
-    lv_obj_t *ui_TabView2;
+    lv_obj_t *ui_optionsTab;
     lv_obj_t *ui_profileSelectorTab;
-    lv_obj_t *ui_Roller1;
+    lv_obj_t *ui_profilesRoller;
     lv_obj_t *ui_webConfigTab;
-    lv_obj_t *ui_Button3;
+    lv_obj_t *ui_webConfigBtn;
     
     lv_obj_t *ui_macrosTab;
     lv_obj_t *ui_Profile_Tab;
