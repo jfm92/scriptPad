@@ -97,7 +97,7 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
         }
 
         // Get macroCodes to be used
-        macroCodes = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroCodes");
+        macroCodes = cJSON_GetObjectItemCaseSensitive(switchMacro, "macroList");
         if(!macroCodes)
         {
             printf("Error getting macroCodes\n");
@@ -114,7 +114,6 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
 
         //Asociate each switchCode with macroCodeList
         macrosDictionary[atoi(cJSON_Print(switchCode))] = macrosCodeList;
-
     }
 
     cJSON_free(codeKey);

@@ -63,7 +63,7 @@ bool filesManagement::writeContentToFile(std::string filename, std::string fileC
     bool result = false;
     FIL file;
 
-    FRESULT fr = f_open(&file, filename.c_str(), FA_OPEN_APPEND | FA_WRITE);
+    FRESULT fr = f_open(&file, filename.c_str(), FA_CREATE_NEW | FA_WRITE);
     if (FR_OK != fr && FR_EXIST != fr)
     {
         printf("Error openning\n");
@@ -156,8 +156,9 @@ void filesManagement::listMacroNames(std::string *fileContent, std::map<uint8_t,
 
     }
 
-    cJSON *nameJSON = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "name");
+    cJSON *nameJSON = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "profileName");
     *profileName = cJSON_Print(nameJSON);
+    *profileName = profileName->substr(1, profileName->size() - 2); //Delete "" from names
     
     cJSON *switchMacro = NULL;
     cJSON *switchMacrosList = cJSON_GetObjectItemCaseSensitive(dictionaryParsed, "switchMacros");
@@ -185,8 +186,11 @@ void filesManagement::listMacroNames(std::string *fileContent, std::map<uint8_t,
             printf("Error getting macroCodes\n");
         }
 
-
+        std::string macroNameAux(cJSON_Print(macrosName));
+        macroNameAux = cJSON_Print(nameJSON);
+        macroNameAux = macroNameAux.substr(1, macroNameAux.size() - 2);
         (*macros)[atoi(cJSON_Print(switchCode))] = cJSON_Print(macrosName);
+
         cJSON_free(switchCode);
         cJSON_free(macrosName);
     }
