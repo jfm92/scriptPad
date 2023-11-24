@@ -187,16 +187,9 @@ void filesManagement::listMacroNames(std::string *fileContent, std::map<uint8_t,
         }
 
         std::string macroNameAux(cJSON_Print(macrosName));
-        macroNameAux = cJSON_Print(nameJSON);
         macroNameAux = macroNameAux.substr(1, macroNameAux.size() - 2);
-        (*macros)[atoi(cJSON_Print(switchCode))] = cJSON_Print(macrosName);
-
-        cJSON_free(switchCode);
-        cJSON_free(macrosName);
+        (*macros)[atoi(cJSON_Print(switchCode))] = macroNameAux.c_str();
     }
 
-    cJSON_free(nameJSON);
-    cJSON_free(switchMacro);
-    cJSON_free(switchMacrosList);
-    cJSON_free(dictionaryParsed);
+    cJSON_Delete(dictionaryParsed);
 }

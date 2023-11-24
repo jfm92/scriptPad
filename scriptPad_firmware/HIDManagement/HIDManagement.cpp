@@ -116,12 +116,7 @@ bool HIDManagement::saveMacrosDictionary(const char * const dataJSON)
         macrosDictionary[atoi(cJSON_Print(switchCode))] = macrosCodeList;
     }
 
-    cJSON_free(codeKey);
-    cJSON_free(switchCode);
-    cJSON_free(macroCodes);
-    cJSON_free(switchMacrosList);
-    cJSON_free(switchMacro);
-    cJSON_free(dictionaryParsed);
+    cJSON_Delete(dictionaryParsed);
 
     succeed = true;
 
