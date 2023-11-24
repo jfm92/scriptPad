@@ -1,29 +1,91 @@
 {
-    "name": "appXYZ",
-    "switch_macros":        [{
-                    "switch_code":  0,
-                    "macro_name": "macro1",
-                    "macros":       [11, 18, 15, 4],
-                    "color_effect": 0
-            }, {
-                    "switch_code":  1,
-                    "macro_name": "macro2",
-                    "macros":       [11, 18, 15, 4],
-                    "color_effect": 0
-            }, {
-                    "switch_code":  2,
-                    "macro_name": "macro3",
-                    "macros":       [11, 18, 15, 4],
-                    "color_effect": 0
-            }, {
-                    "switch_code":  3,
-                    "macro_name": "macro4",
-                    "macros":       [11, 18, 15, 4],
-                    "color_effect": 0
-            }, {
-                    "switch_code":  4,
-                    "macro_name": "macro5",
-                    "macros":       [11, 18, 15, 4],
-                    "color_effect": 0
-            }]
+    "profileName": "profileTest",
+    "profileBackgroundEffect": "Solid",
+    "profileMainColor": "#00ccff",
+    "profileSecColor": "#000000",
+    "switchMacros": [
+        {
+            "switchCode": 0,
+            "macroName": "SwitchTest",
+            "pushColor": "#0033ff",
+            "macroList": [
+                [
+                    11,
+                    8,
+                    15,
+                    15,
+                    18
+                ],
+                224,
+                226,
+                76
+            ]
+        },
+        {
+            "switchCode": 1,
+            "macroName": "profileTest1",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 2,
+            "macroName": "profileTest2",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 3,
+            "macroName": "profileTest3",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 4,
+            "macroName": "profileTest4",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 5,
+            "macroName": "profileTest5",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 6,
+            "macroName": "profileTest6",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 7,
+            "macroName": "profileTest7",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 8,
+            "macroName": "profileTest8",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 9,
+            "macroName": "profileTest9",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 10,
+            "macroName": "profileTest10",
+            "pushColor": 0,
+            "macroList": []
+        },
+        {
+            "switchCode": 11,
+            "macroName": "profileTest11",
+            "pushColor": 0,
+            "macroList": []
+        }
+    ]
 }
