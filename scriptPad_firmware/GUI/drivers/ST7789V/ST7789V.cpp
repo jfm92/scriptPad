@@ -56,10 +56,13 @@ void ST7789V::draw(uint16_t startX, uint16_t startY, uint16_t endX, uint16_t end
 {
 	setWindows(startX,startY,endX, endY);
 
+    //Maybe we don't fill all the buffer, so we need to calculate how many pixels we're write into buffer;
+    uint64_t dataSize = (endX - startX) * (endY -startY) * 2;
+
     gpio_put(dcGPIO, 1);
     gpio_put(csGPIO, 0);
 
-    sendDataN(color_p, resolutionWidth * bufferLines * 2);
+    sendDataN(color_p, dataSize);
 
     gpio_put(csGPIO, 1);
 
