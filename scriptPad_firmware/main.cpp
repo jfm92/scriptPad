@@ -8,6 +8,7 @@
 #include "hwConfig.h"
 
 #include "inputsManagement/switchManagement.h"
+#include "inputsManagement/encoderManagement.h"
 #include "HIDManagement/HIDManagement.h"
 #include "GUI/GUI.h"
 #include "GUI/drivers/ST7789V/ST7789V.h"
@@ -24,6 +25,7 @@
 modemUSBManagement* modemUSBManagement::instanceModemUSB = NULL; 
 filesManagement* filesManagement::instanceFileManagement = NULL;
 switchManagement* switchManagement::instance = NULL;
+encoderManagement* encoderManagement::instance = NULL;
 HIDManagement* HIDManagement::instanceHID = NULL; 
 ST7789V* ST7789V::instaceST7789V = NULL;
 GUI* GUI::instanceGUI = NULL; 
@@ -127,6 +129,13 @@ int main(void)
     switchManagementInstance.setGUIMessageQueue(&GUIPushQueue);
     switchManagementInstance.setSwitchConfig(&switchMatrix);
     switchManagementInstance.initGPIO();
+
+    encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
+    
+    encoderManagementInstance.setHIDMessageQueue(&HIDPushQueue);
+    encoderManagementInstance.setGUIMessageQueue(&GUIPushQueue);
+    encoderManagementInstance.setEncoderConfig(&gpioConfigEncoder);
+    encoderManagementInstance.init();
 
     //Tasks Initialization
     //It must be this exact order

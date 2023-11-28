@@ -52,6 +52,7 @@ add_executable(scriptPad main.cpp)
 target_sources(scriptPad PUBLIC
             ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/switchManagement.cpp
+            ${CMAKE_CURRENT_SOURCE_DIR}/inputsManagement/encoderManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/HIDManagement/HIDManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/filesManagement.cpp
             ${CMAKE_CURRENT_SOURCE_DIR}/filesManagement/hw_config.c
