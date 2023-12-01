@@ -70,7 +70,9 @@ bool filesManagement::writeContentToFile(std::string filename, std::string fileC
         return result;
     }
 
-    if (f_printf(&file, fileContent.c_str()) < 0) {
+    unsigned int writeResult = 0;
+    f_write(&file, fileContent.c_str(), fileContent.size(), &writeResult);
+    if (writeResult != fileContent.size()) {
         printf("f_printf failed\n");
         return result;
     }
