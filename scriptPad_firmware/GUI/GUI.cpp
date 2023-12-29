@@ -43,14 +43,35 @@ static void my_input_read(lv_indev_drv_t * drv, lv_indev_data_t*data)
 
     if(controlAvailable && xQueueReceive(*GUIInstance.getQueue(), &recvSwitchCode, 0))
     {
-        if(recvSwitchCode == 4) keyPrev = LV_KEY_ENTER;
-        else if(recvSwitchCode == 1) keyPrev = LV_KEY_DOWN;
-        else if(recvSwitchCode == 7) keyPrev = LV_KEY_UP;
-        else if((recvSwitchCode == 5) || (recvSwitchCode == 3)) {
-           // keyPrev = LV_KEY_PREV;
-            state = !state;
-            GUIInstance.GUIMoveTab(state);
+        //TODO: Maybe change to a map??
+        switch (recvSwitchCode)
+        {
+            case 2:
+                keyPrev = LV_KEY_UP;
+                break;
+            
+            case 5:
+                state = !state;
+                GUIInstance.GUIMoveTab(state);
+                break;
+            
+            case 6:
+                keyPrev = LV_KEY_ENTER;
+                break;
+            
+            case 7:
+                state = !state;
+                GUIInstance.GUIMoveTab(state);
+                break;
+            
+            case 10:
+                keyPrev = LV_KEY_DOWN;
+                break;
+            
+            default:
+                break;
         }
+
         keyPressed = true;
     }
 
@@ -250,7 +271,7 @@ void GUI::webConfigScreen()
     lv_obj_set_width( ui_TextArea1, 230);
     lv_obj_set_height( ui_TextArea1, LV_SIZE_CONTENT);   /// 50
     lv_obj_set_align( ui_TextArea1, LV_ALIGN_TOP_MID );
-    lv_textarea_set_text(ui_TextArea1,"Open your browser and type IP:\n192.168.1.7");
+    lv_textarea_set_text(ui_TextArea1,"Open your browser and type IP:\n192.168.7.1");
     lv_textarea_set_placeholder_text(ui_TextArea1,"Placeholder...");
     lv_obj_set_style_text_align(ui_TextArea1, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN| LV_STATE_DEFAULT);
 
