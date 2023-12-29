@@ -31,17 +31,17 @@ static uint16_t _desc_str[32];
 char const* string_desc_arr [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "scritPadHID",                     // 1: Manufacturer
-  "scriptPadHID",              // 2: Product
+  "scritPadModemDev",              // 1: Manufacturer
+  "scritPadModemDev",              // 2: Product
   serial,                        // 3: Serials, uses the flash ID
 };
 
 char const* string_desc_arr1 [] =
 {
   (const char[]) { 0x09, 0x04 }, // 0: is supported language is English (0x0409)
-  "scritPadHID",                     // 1: Manufacturer
-  "scriptPadConfigDev",              // 2: Product
-  serial,                        // 3: Serials, uses the flash ID
+  "scriptPadHIDDev",                     // 1: Manufacturer
+  "scriptPadHIDDev",              // 2: Product
+  serial1,                        // 3: Serials, uses the flash ID
 };
 
 enum
