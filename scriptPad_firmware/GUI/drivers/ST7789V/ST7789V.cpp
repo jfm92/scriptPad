@@ -115,7 +115,7 @@ void ST7789V::sendDisplayInitialization()
 	//Command code , Data to send
 	std::multimap<uint8_t, std::vector<uint8_t>> initList = {
         {0x11, {}}, //Sleep
-        {0x36, {0x70}}, //Orientantion 0x00 to invert
+        {0x36, {0xB0}}, //Orientantion 0x70 to invert
         {0x3A, {0x05}}, //Mode 16 bits RGB
         {0x20, {}}, // Disabler Invert Colors
         {0x2A, {0x00, 0x00, 0x01, 0x3F}}, // Setting X Resolution
