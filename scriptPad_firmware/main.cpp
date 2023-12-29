@@ -70,7 +70,7 @@ void managerTaskFun(__unused void *params)
     //Display initialization
     ST7789V& displayInstance = ST7789V::getInstance();
     displayInstance.init();
-    displayInstance.clear(0xFFFF);
+    displayInstance.clear(0x0000);
 
     //Look for a previous configuration
     filesManagement& FSmanagementInstance = filesManagement::getInstance();
@@ -98,9 +98,9 @@ void managerTaskFun(__unused void *params)
 
 void backGroundLightTask(__unused void *params)
 {
-    backlightmanagement backligth(23,1);
+    backlightmanagement backligth(23,12);
     backligth.init();
-    backligth.setBackgroundEffect(0x00);;
+    backligth.setBackgroundEffect(0x00);
     backligth.setQueue(&backLightPushQueue);
 
     while(1)
@@ -130,12 +130,12 @@ int main(void)
     switchManagementInstance.setSwitchConfig(&switchMatrix);
     switchManagementInstance.initGPIO();
 
-    encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
+   /* encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
     
     encoderManagementInstance.setHIDMessageQueue(&HIDPushQueue);
     encoderManagementInstance.setGUIMessageQueue(&GUIPushQueue);
     encoderManagementInstance.setEncoderConfig(&gpioConfigEncoder);
-    encoderManagementInstance.init();
+    encoderManagementInstance.init();*/
 
     //Tasks Initialization
     //It must be this exact order
