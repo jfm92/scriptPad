@@ -178,7 +178,7 @@ void GUI::LVGLTask()
 
 void GUI::GUIMoveTab(uint8_t tabNum)
 {
-    lv_tabview_set_act(ui_optionsTab, tabNum, LV_ANIM_ON);
+    lv_tabview_set_act(ui_optionsTab, tabNum, LV_ANIM_OFF);
     lv_group_focus_obj((tabNum) ? ui_webConfigBtn : ui_profilesRoller);
 }
 
@@ -387,7 +387,7 @@ void GUI::loadMacroScreen(std::string profileName)
     Foo(false);
     setGUIControlAvailable(false);
     macrosScreen(profileName);
-    lv_scr_load_anim(ui_macrosScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 50, 0, true);
+    lv_scr_load_anim(ui_macrosScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
     vTaskResume(*HIDTask_Handle);
 }
 
@@ -395,6 +395,6 @@ void GUI::loadWebConfigScreen()
 {
     Foo(true);
     webConfigScreen();
-    lv_scr_load_anim(ui_webConfigScreen, LV_SCR_LOAD_ANIM_OVER_TOP, 50, 0, true);
+    lv_scr_load_anim(ui_webConfigScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
     vTaskResume(*modemUSBTask_Handle);
 }

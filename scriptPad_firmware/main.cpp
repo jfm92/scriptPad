@@ -115,6 +115,8 @@ int main(void)
     board_init();
     time_init();
 
+    set_sys_clock_khz(250000, true);
+
     UBaseType_t uxCoreAffinityMask;
 
     //Internal queue initialization
