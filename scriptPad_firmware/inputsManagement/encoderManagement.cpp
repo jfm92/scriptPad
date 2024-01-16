@@ -2,12 +2,19 @@
 
 #include "stdio.h"
 
+#include "FreeRTOS.h"
+#include "pico/stdlib.h"
+#include "hardware/gpio.h"
+
 ////////////////////// Externals callbacks //////////////////////
 void encoderButtonCB(uint gpio, uint32_t events);
 uint8_t pushedTimes = 0;
+BaseType_t xHigherPrioritTaskWoken = pdFALSE;
 
 int64_t longPressTimerCB(alarm_id_t id, void *user_data){
     encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
+
+    uint8_t encoderSWPin = encoderManagementInstance.encoderGPIOList[0];
 
     if(encoderManagementInstance.getEnconderSwitchState()){
         if(encoderManagementInstance.isLongPush()){
@@ -18,7 +25,11 @@ int64_t longPressTimerCB(alarm_id_t id, void *user_data){
             //If the user forget the finger on the switch, we need to wait until it's released
             while(encoderManagementInstance.getEnconderSwitchState()){}
 
-            gpio_set_irq_enabled_with_callback(encoderManagementInstance.getFunctionGPIO(0), GPIO_IRQ_EDGE_FALL , true, &encoderButtonCB);
+            // We send the same ID but in a different queue
+            uint8_t ID = encoderManagementInstance.encoderGPIOSWID[0];
+            xQueueSendToFrontFromISR(*encoderManagementInstance.GUIQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+
+            gpio_set_irq_enabled(encoderSWPin, GPIO_IRQ_EDGE_FALL, true); 
         }
 
         //This could be al long push, but we need to wait a few cycles more
@@ -27,58 +38,83 @@ int64_t longPressTimerCB(alarm_id_t id, void *user_data){
     }
     else{
         // Not a long push, just a normal one, reset counter and reenable IRQ
-        //TODO: Send normal push notication
-        printf("Pushed\n");
+        printf("Encoder Pushed\n");
+
+        uint8_t ID = encoderManagementInstance.encoderGPIOSWID[0]; //ID of encoder on clockwise movement
+        xQueueSendToFrontFromISR(*encoderManagementInstance.encoderQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+
         encoderManagementInstance.resetPushCycle();
-        gpio_set_irq_enabled_with_callback(encoderManagementInstance.getFunctionGPIO(0), GPIO_IRQ_EDGE_FALL , true, &encoderButtonCB);
+        gpio_set_irq_enabled(encoderSWPin, GPIO_IRQ_EDGE_FALL, true); 
     }
 
     return 0;
 }
 
-void encoderButtonCB(uint gpio, uint32_t events){
-    // Switch was pushed, but we need to be sure it's not a long push, push notification will be send
-    // on timerCB
-    gpio_set_irq_enabled_with_callback(gpio, GPIO_IRQ_EDGE_FALL , false, &encoderButtonCB);
-    add_alarm_in_ms(50, longPressTimerCB, NULL, false);
-}
-
-void encoderTask(void *param){
+void encoderCB(void){
     encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
 
-    uint8_t rightCount = 0;
-    uint8_t leftCount = 0;
+    // Are selected by their pin ID
+    uint8_t encoderAPin = encoderManagementInstance.encoderGPIOList[1];
+    uint8_t encoderBPin = encoderManagementInstance.encoderGPIOList[2];
+    uint8_t encoderSWPin = encoderManagementInstance.encoderGPIOList[0];
 
-    uint8_t previousState = encoderManagementInstance.getEnconderContactAState();
 
-    //  This loop is basically to check if we change from contact A to B or viceversa
-    // but due to it could be some bouncing between contacts, we send movement if
-    // we detect contact change two times.
-    while(1){
-        uint8_t actualState = encoderManagementInstance.getEnconderContactAState();
-        if(rightCount == 2){
-            printf("Right\n");
-            rightCount= 0; 
-        }
-        else if(leftCount == 2) {
-            // TODO: Send left movement to queue
-            printf("Left\n");
-            leftCount = 0;
-        }
+    //Get which pin produced interruption
+    bool encoderAInt = gpio_get_irq_event_mask(encoderAPin) & GPIO_IRQ_EDGE_FALL;
+    bool encoderBInt = gpio_get_irq_event_mask(encoderBPin) & GPIO_IRQ_EDGE_FALL;
+    bool encoderSWInt = gpio_get_irq_event_mask(encoderSWPin) & GPIO_IRQ_EDGE_FALL;
 
-        if(actualState != previousState){
-            if(actualState != encoderManagementInstance.getEnconderContactBState()){
-                rightCount = (rightCount > 2) ? rightCount : rightCount + 1;
-                leftCount = (leftCount == 0) ? leftCount : leftCount -1;
+    if(encoderAInt || encoderBInt){
+        gpio_acknowledge_irq(encoderAInt ? encoderAPin : encoderBPin, GPIO_IRQ_EDGE_FALL); //Ack Int
+
+        if (time_us_64() > encoderManagementInstance.timeCounter + encoderManagementInstance.timeThreshold)
+        {
+            //Base on which contact was activated, we need to do a different comparasion
+            bool encoderCondition = encoderAInt ? 
+            (encoderManagementInstance.getEnconderContactAState() == encoderManagementInstance.getEnconderContactBState()) : 
+            (encoderManagementInstance.getEnconderContactAState() != encoderManagementInstance.getEnconderContactBState());
+
+            if (encoderCondition)
+            {
+                encoderManagementInstance.ISRCounterA++;
+                if(encoderManagementInstance.ISRCounterA == encoderManagementInstance.minIntCount){
+                    printf("Anti Clockwise Encoder\n");
+                    
+                    encoderManagementInstance.ISRCounterA = 0;
+                    encoderManagementInstance.ISRCounterB = 0;
+
+                    uint8_t ID = encoderManagementInstance.encoderGPIOSWID[1]; //ID of encoder on anti clockwise movement
+                    xQueueSendToFrontFromISR(*encoderManagementInstance.encoderQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+                }
             }
-            else{
-                leftCount = (leftCount > 2) ? leftCount : leftCount + 1;
-                rightCount = (rightCount == 0) ? rightCount : rightCount -1;
+            else
+            {
+                encoderManagementInstance.ISRCounterB++;
+                if(encoderManagementInstance.ISRCounterB == encoderManagementInstance.minIntCount){
+                    printf("Clockwise Encoder\n");
+
+                    encoderManagementInstance.ISRCounterB = 0;
+                    encoderManagementInstance.ISRCounterA = 0;
+
+                    uint8_t ID = encoderManagementInstance.encoderGPIOSWID[2]; //ID of encoder on clockwise movement
+                    xQueueSendToFrontFromISR(*encoderManagementInstance.encoderQUEUEInternal, &ID, &xHigherPrioritTaskWoken );
+                }
             }
-            previousState = actualState;
+            encoderManagementInstance.timeCounter = time_us_64();
         }
+
+    }
+
+    // Switch encoder management
+    if (encoderSWInt) {
+        gpio_acknowledge_irq(encoderSWPin, GPIO_IRQ_EDGE_FALL);
+        gpio_set_irq_enabled(encoderSWPin, GPIO_IRQ_EDGE_FALL, false); 
+
+        //Disabled to avoid bouncing
+        add_alarm_in_ms(150, longPressTimerCB, NULL, false);
     }
 }
+
 
 ////////////////////// Externals callbacks End //////////////////////
 
@@ -93,23 +129,22 @@ bool encoderManagement::init(){
             return result;
         }
     
+
     //Initialize each GPIO of the encoder
     for(const auto& gpio : *gpioEncoder){
-        // Position 1 and 2, are encoder contacts
-        // This will be checked on a thread, so we don't need an interruption
-        if(gpio.first > 0 && gpio.first < 3){ 
-            gpio_init(gpio.second);
-            gpio_set_pulls(gpio.second, true, false); //PullUP
-            gpio_set_dir(gpio.second, false);
-        }
-        else if(gpio.first == 0){
-            gpio_init(gpio.second);
-            gpio_set_pulls(gpio.second, true, false);
-            gpio_set_irq_enabled_with_callback(gpio.second, GPIO_IRQ_EDGE_FALL, true, &encoderButtonCB);
-        }
-    }
+        gpio_init(gpio.second);
+        gpio_set_pulls(gpio.second, true, false);//PullUp
+        gpio_set_dir(gpio.second, false); //Input
+        gpio_set_irq_enabled(gpio.second, GPIO_IRQ_EDGE_FALL, true); 
 
-    xTaskCreate( encoderTask, "encoderControl", 4096, NULL, configMAX_PRIORITIES-2, &encoderTask_Handle);
+        gpio_add_raw_irq_handler(gpio.second, encoderCB);
+
+        encoderGPIOList.push_back(gpio.second);
+        encoderGPIOSWID.push_back(gpio.first);
+    }
+    
+    
+    irq_set_enabled(IO_IRQ_BANK0, true);
 
     result = (encoderTask_Handle != nullptr) ? true : false;
 

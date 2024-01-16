@@ -10,6 +10,7 @@
 #include "pico/stdlib.h"
 
 #include <map>
+#include <vector>
 
 class encoderManagement
 {
@@ -59,36 +60,33 @@ class encoderManagement
 
         std::map<uint8_t, uint8_t> *gpioEncoder = nullptr;
 
+        std::vector<uint8_t> encoderGPIOList;
+        std::vector<uint8_t> encoderGPIOSWID;
+
         bool encoderInitialized = false;
         uint8_t longPushCyclesCount = 0;
 
+        const int timeThreshold = 5;
+        long timeCounter = 0;
+    
+        int32_t ISRCounterA = 0;
+        int32_t ISRCounterB = 0;
+        //Const with minimal pulsed to register an action
+        const uint8_t minIntCount = 6; 
+
+
         encoderManagement(){};
 
-        bool getEnconderSwitchState() {
-            auto gpioNum = gpioEncoder->find(0);
-            return !gpio_get(gpioNum->second);
-        };
-        bool getEnconderContactAState() {
-            auto gpioNum = gpioEncoder->find(1);
-            return !gpio_get(gpioNum->second);
-        };
-        bool getEnconderContactBState() {
-            auto gpioNum = gpioEncoder->find(2);
-            return !gpio_get(gpioNum->second);
-        };
+        bool getEnconderSwitchState() { return !gpio_get(encoderGPIOList[0]);};
+        bool getEnconderContactAState() {return !gpio_get(encoderGPIOList[1]);};
+        bool getEnconderContactBState() {return !gpio_get(encoderGPIOList[2]);};
 
         void increasePushCycle(){longPushCyclesCount ++;};
         void resetPushCycle(){longPushCyclesCount = 0;};
         bool isLongPush(){return (longPushCyclesCount > 5);};
 
-        uint8_t getFunctionGPIO(uint8_t gpioCode){
-            auto gpioNum = gpioEncoder->find(gpioCode);
-            return gpioNum->second;
-        }
-
-        friend void encoderTask(void *param);
         friend int64_t longPressTimerCB(alarm_id_t id, void *user_data);
-        friend void encoderButtonCB(uint gpio, uint32_t events);
+        friend void encoderCB(void);
 };
 
 #endif
