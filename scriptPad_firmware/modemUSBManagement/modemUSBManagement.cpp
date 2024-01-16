@@ -29,6 +29,7 @@ extern "C"
 }
 
 static struct pbuf *received_frame;
+std::string incomingBuffer;
 
 /////////////////////////////////////////////////////////////
 
@@ -77,31 +78,23 @@ uint16_t tud_network_xmit_cb(uint8_t *dst, void *ref, uint16_t arg)
 
 
 /************************** API POST CallBacks *********************************/
+char *buf;
+uint32_t offset= 0;
+int incomingSize = 0;
 void httpd_post_finished(void *connection, char *response_uri, u16_t response_uri_len)
 {
-  printf("Sending response\n");
-  snprintf(response_uri, response_uri_len, "/saveConfig");
-}
-
-err_t httpd_post_begin(void *connection, const char *uri, const char *http_request,
-                 u16_t http_request_len, int content_len, char *response_uri,
-                 u16_t response_uri_len, u8_t *post_auto_wnd)
-{
-  return ERR_OK;
-}
-
-err_t httpd_post_receive_data(void *connection, struct pbuf *p)
-{
   filesManagement& FSmanagementInstance = filesManagement::getInstance();
-
-  std::string fileContent(static_cast<char*>(p->payload));
-
-  //We need to parse incoming file to be sure if it's a valid json file
+  printf("Sending response\n\n");
+ // snprintf(response_uri, response_uri_len, "/saveConfig");
+ 
+ std::string fileContent(static_cast<char*>(buf));
+ printf("Incoming buffer %s\n\n", fileContent.c_str());
+ //We need to parse incoming file to be sure if it's a valid json file
   cJSON *incomingData = cJSON_Parse(fileContent.c_str());
   if(!incomingData)
   {
     printf("Error parsing incomingData JSON\n");
-    return ERR_VAL;
+    //return ERR_VAL;
   }
 
   cJSON *nameJSON = cJSON_GetObjectItemCaseSensitive(incomingData, "profileName");
@@ -117,7 +110,29 @@ err_t httpd_post_receive_data(void *connection, struct pbuf *p)
 
   cJSON_Delete(incomingData);
 
-  return fsResult ? ERR_OK : ERR_VAL;
+  //return fsResult ? ERR_OK : ERR_VAL;
+}
+
+
+err_t httpd_post_begin(void *connection, const char *uri, const char *http_request,
+                 u16_t http_request_len, int content_len, char *response_uri,
+                 u16_t response_uri_len, u8_t *post_auto_wnd)
+{
+  buf = (char *)malloc(content_len);
+  memset(buf, 0x00, content_len);
+
+  return ERR_OK;
+}
+
+err_t httpd_post_receive_data(void *connection, struct pbuf *p)
+{
+  memcpy(buf + offset, static_cast<char*>(p->payload), p->len);
+  offset += p->len;
+
+  printf("Offset %i\n", offset);
+  printf("Incoming data %s\n", buf);
+
+  return ERR_OK;
 }
 
 
