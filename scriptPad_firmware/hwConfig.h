@@ -16,9 +16,9 @@ std::multimap<uint8_t, std::pair<uint8_t, uint8_t>> switchMatrix = {
     std::make_pair(16, std::make_pair(12, 22)),
 };
 
-
+// Switch ID, encoder Pin
 std::map<uint8_t, uint8_t> gpioConfigEncoder = {
-    {0, 26}, //Encoder button
-    {1, 27}, //Encoder contact A
-    {2, 28}, //Encoder contact B
+    {13, 26}, //Encoder switch -> ID 13 Push button
+    {14, 27}, //Encoder contact A -> ID 14 Clockwise movement
+    {15, 28}, //Encoder contact B -> ID 15 AntiClockwise movement
 };
