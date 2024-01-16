@@ -115,6 +115,7 @@ int main(void)
     board_init();
     time_init();
 
+    // Comment to use UART
     set_sys_clock_khz(250000, true);
 
     UBaseType_t uxCoreAffinityMask;
@@ -132,12 +133,12 @@ int main(void)
     switchManagementInstance.setSwitchConfig(&switchMatrix);
     switchManagementInstance.initGPIO();
 
-   /* encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
+    encoderManagement& encoderManagementInstance = encoderManagement::getInstance();
     
     encoderManagementInstance.setHIDMessageQueue(&HIDPushQueue);
     encoderManagementInstance.setGUIMessageQueue(&GUIPushQueue);
     encoderManagementInstance.setEncoderConfig(&gpioConfigEncoder);
-    encoderManagementInstance.init();*/
+    encoderManagementInstance.init();
 
     //Tasks Initialization
     //It must be this exact order
