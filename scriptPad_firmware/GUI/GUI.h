@@ -6,6 +6,8 @@
 #include "task.h"
 #include "queue.h"
 #include <string>
+#include <vector>
+#include <algorithm>
 
 class GUI
 {
@@ -53,12 +55,43 @@ private:
     lv_indev_drv_t inputDriver;
     lv_indev_t * inputDriverKeypad;
 
+    uint16_t macroProfileIDSelected = 0;
+    std::vector<std::string> macroProfileNameVector;
+
     void frontEndInit();
     void mainScreen();
     void webConfigScreen();
     void macrosScreen(std::string fileName);
     void loadMacroScreen(std::string profileName);
     void loadWebConfigScreen();
+
+    void saveProfileSelected(std::string profileName){
+        auto position = std::find(macroProfileNameVector.begin(), macroProfileNameVector.end(), profileName);
+
+        // If on nay case we don't find it, we return position 0;
+        macroProfileIDSelected = (position != macroProfileNameVector.end()) ? 
+                                    std::distance(macroProfileNameVector.begin(), position) : 0;
+
+    };
+
+    std::string actualProfileID() {return macroProfileNameVector.empty() ? " " : macroProfileNameVector[macroProfileIDSelected];};
+
+    std::string setNextProfile(){
+        //We check if there a next profile, otherwise, we keep the actual ID
+        macroProfileIDSelected = ((macroProfileIDSelected ++) <= macroProfileNameVector.size()) ? 
+                                macroProfileIDSelected ++ : macroProfileIDSelected;
+
+        return macroProfileNameVector[macroProfileIDSelected];
+    }
+
+    std::string getPreviousProfile(){
+        //Check if we arrive to 0, otherwise we return the same previous
+        macroProfileIDSelected = ((macroProfileIDSelected --) >= 0) ? 
+                                macroProfileIDSelected -- : macroProfileIDSelected;
+
+        return macroProfileNameVector[macroProfileIDSelected];
+    }
+    
 
     //Screens
     lv_obj_t *ui_mainScreen;
